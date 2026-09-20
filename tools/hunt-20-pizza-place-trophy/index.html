@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hunt: 20 Pizza Place Trophy Brute Forcer - NORTHSTAR's tools</title>
+  <meta name="description" content="Permutation helper for Roblox The Hunt Work at a Pizza Place 20-trophy code puzzle.">
+  <meta name="theme-color" content="#002B36">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../images/icon.png">
+  <link rel="apple-touch-icon" href="../../images/icon.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="tool.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <img src="../../images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <span class="site-title"><a href="../../">NORTHSTAR's tools</a></span>
+          <span class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Tool Navigation Bar -->
+  <nav class="tool-nav-bar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <a href="../../" class="back-link">&larr; Back to NORTHSTAR's tools</a>
+      <button class="share-tool-btn" id="share-page-btn" title="Copy link to this tool">Copy Tool Link</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container tool-container">
+
+      <!-- Tool Header Block -->
+      <div class="tool-header-block">
+        <h1 class="tool-main-title">Hunt: 20 Pizza Place Trophy Brute Forcer</h1>
+        <p class="tool-lead-desc">
+          Calculates all 24 possible order combinations for the 4 emojis on your pizza trophy and cycles through random untried permutations until you find the winning code.
+        </p>
+      </div>
+
+      <!-- Step 1: Input Setup Panel -->
+      <section class="panel-card" id="setup-panel">
+        <h2 class="panel-title">
+          <span class="step-badge">Step 1</span> Enter 4 Trophy Emojis
+        </h2>
+
+        <div class="emoji-input-group">
+          <input 
+            type="text" 
+            id="emoji-input" 
+            class="emoji-text-input" 
+            placeholder="e.g. 🍕🍄🧀🍅" 
+            autocomplete="off" 
+            spellcheck="false"
+            maxlength="16"
+          >
+          <button class="btn btn-secondary" id="clear-input-btn" type="button">Clear</button>
+        </div>
+
+        <p class="input-status-hint" id="input-hint">Enter exactly 4 emojis from your trophy.</p>
+
+        <!-- Quick Pick Helper for Pizza Place Ingredients -->
+        <div class="quick-pick-section">
+          <span class="quick-pick-label">Quick select ingredients (click 4):</span>
+          <div class="quick-pick-buttons">
+            <button type="button" class="quick-emoji-btn" data-emoji="🍕" title="Pizza">🍕</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🍄" title="Mushroom">🍄</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🧀" title="Cheese">🧀</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🍅" title="Tomato">🍅</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🫒" title="Olive">🫒</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🥓" title="Bacon">🥓</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🍍" title="Pineapple">🍍</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🧅" title="Onion">🧅</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🌶️" title="Pepper">🌶️</button>
+            <button type="button" class="quick-emoji-btn" data-emoji="🥩" title="Meat">🥩</button>
+          </div>
+        </div>
+
+        <div style="margin-top: 22px;">
+          <button class="btn btn-primary" id="start-btn" style="width: 100%;" disabled>
+            Start Brute Force (24 Combinations) &rarr;
+          </button>
+        </div>
+      </section>
+
+      <!-- Step 2: Active Brute Force Panel (Hidden Initially) -->
+      <section class="panel-card" id="active-panel" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="panel-title" style="margin-bottom: 0;">
+            <span class="step-badge">Step 2</span> Testing Combinations
+          </h2>
+          <button class="btn btn-secondary" id="restart-btn" style="padding: 4px 10px; font-size: 0.8rem;">
+            Change Emojis
+          </button>
+        </div>
+
+        <!-- Solved Banner -->
+        <div class="success-banner" id="solved-banner" style="display: none;">
+          <h3>Trophy Code Unlocked!</h3>
+          <p id="solved-summary-text">Working code found.</p>
+          <button class="btn btn-success" id="solved-again-btn">Start Over</button>
+        </div>
+
+        <!-- Exhausted Banner -->
+        <div class="exhausted-banner" id="exhausted-banner" style="display: none;">
+          <h3>All 24 Combinations Tested</h3>
+          <p>None of the 24 permutations worked for the entered emojis.</p>
+          <button class="btn btn-secondary" id="exhausted-restart-btn">Check Emojis &amp; Retry</button>
+        </div>
+
+        <!-- Active Candidate Box -->
+        <div class="active-trial-box">
+          <div class="trial-counter" id="attempt-counter">Attempt 1 of 24</div>
+          <div class="current-combo-display" id="current-combo-display"></div>
+          <div class="trial-help-text">Try entering this exact order in Roblox</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="trial-actions">
+          <button class="btn btn-secondary" id="failed-btn">
+            Didn't work (Try Next)
+          </button>
+          <button class="btn btn-success" id="success-btn">
+            This worked! (Solved)
+          </button>
+          <button class="btn btn-secondary" id="copy-candidate-btn" title="Copy this combination to clipboard">
+            Copy Combination
+          </button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-number" id="stat-total">24</div>
+            <div class="stat-label">Total Permutations</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="stat-tried">0</div>
+            <div class="stat-label">Tested (Failed)</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number" id="stat-remaining">23</div>
+            <div class="stat-label">Untried Left</div>
+          </div>
+        </div>
+
+        <!-- History Log of Tested Combinations -->
+        <div class="history-section">
+          <div class="history-title">
+            <span>Tested Combinations</span>
+            <span style="color: var(--text-muted); font-weight: normal;">Crossed out = failed</span>
+          </div>
+          <div class="history-list" id="history-list">
+            <span style="color: var(--text-muted); font-size: 0.8rem; padding: 4px;">No combinations tested yet.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Protip Callout -->
+      <aside class="protip-box">
+        <div class="protip-box-title">Protip</div>
+        <p class="protip-box-text">If it doesn't work, check the code or the trophy you have.</p>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools</span>
+        <a href="../../">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Script -->
+  <script src="tool.js"></script>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NORTHSTAR's tools</title>
+  <meta name="description" content="Tools made for NORTHSTAR, and maybe for some people">
+  <meta name="theme-color" content="#002B36">
+  
+  <!-- Site Icon -->
+  <link rel="icon" type="image/png" href="images/icon.png">
+  <link rel="apple-touch-icon" href="images/icon.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <img src="images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <h1 class="site-title"><a href="./">NORTHSTAR's tools</a></h1>
+          <p class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container">
+      
+      <!-- Section Header -->
+      <div class="section-header">
+        <h2 class="section-title">Directory</h2>
+        <span class="tools-count" id="tools-count">1 tool</span>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-wrapper">
+        <input 
+          type="text" 
+          id="search-input" 
+          class="search-input" 
+          placeholder="Filter tools..." 
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+
+      <!-- Tools List -->
+      <div class="tools-list" id="tools-list">
+        <!-- Rendered dynamically via js/hub.js -->
+        <noscript>
+          <article class="tool-card">
+            <div class="tool-card-top">
+              <h2 class="tool-title">
+                <a href="tools/hunt-20-pizza-place-trophy/">Hunt: 20 Pizza Place Trophy Brute Forcer</a>
+              </h2>
+              <span class="tool-badge">Roblox Hunt</span>
+            </div>
+            <p class="tool-desc">Calculates all 24 emoji permutations for the 20-trophy code in Work at a Pizza Place and walks you through testing them randomly until you find the working code.</p>
+            <div class="tool-card-footer">
+              <a href="tools/hunt-20-pizza-place-trophy/" class="tool-link-btn">Open Tool &rarr;</a>
+              <span class="tool-date">2024</span>
+            </div>
+          </article>
+        </noscript>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools</span>
+        <span>Hosted on Vercel</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/hub.js"></script>
+</body>
+</html>
