@@ -53,20 +53,16 @@ That's it! The tool will immediately appear on the hub with its card, search fil
 
 ---
 
-## Pushing to GitHub (`NORTHSTAR tools`)
+## Repository
 
-1. Go to [GitHub](https://github.com/new) and create a new repository named:
-   ```
-   NORTHSTAR tools
-   ```
-   *(Leave it empty without a README, gitignore, or license since we already have them locally)*.
+- **GitHub**: [https://github.com/BlackwellArchitecture/-NORTHSTAR-tools](https://github.com/BlackwellArchitecture/-NORTHSTAR-tools)
 
-2. In your terminal, link your repository and push:
-   ```bash
-   git remote add origin https://github.com/<YOUR-USERNAME>/NORTHSTAR-tools.git
-   git branch -M main
-   git push -u origin main
-   ```
+To push future updates:
+```bash
+git add .
+git commit -m "Your update description"
+git push
+```
 
 ---
 
