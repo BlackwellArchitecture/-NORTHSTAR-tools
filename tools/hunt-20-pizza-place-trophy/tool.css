@@ -83,46 +83,6 @@
   color: var(--text-muted);
 }
 
-/* Quick Pick Emoji Helper */
-.quick-pick-section {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(27, 83, 97, 0.4);
-}
-
-.quick-pick-label {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  margin-bottom: 8px;
-  display: block;
-}
-
-.quick-pick-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.quick-emoji-btn {
-  background-color: var(--bg-inset);
-  border: 1px solid var(--border-color);
-  font-size: 1.25rem;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.15s ease;
-}
-
-.quick-emoji-btn:hover {
-  background-color: var(--bg-surface-hover);
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
 
 .input-status-hint {
   font-size: 0.85rem;

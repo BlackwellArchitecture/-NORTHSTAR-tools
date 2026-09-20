@@ -19,7 +19,6 @@
   const startBtn = document.getElementById("start-btn");
   const clearInputBtn = document.getElementById("clear-input-btn");
   const inputHint = document.getElementById("input-hint");
-  const quickEmojiBtns = document.querySelectorAll(".quick-emoji-btn");
 
   const setupPanel = document.getElementById("setup-panel");
   const activePanel = document.getElementById("active-panel");
@@ -300,17 +299,6 @@
     emojiInput.value = "";
     emojiInput.focus();
     updateInputValidation();
-  });
-
-  quickEmojiBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const emoji = btn.getAttribute("data-emoji");
-      const currentChars = extractGraphemes(emojiInput.value);
-      if (currentChars.length < 4) {
-        emojiInput.value += emoji;
-        updateInputValidation();
-      }
-    });
   });
 
   startBtn.addEventListener("click", startBruteForce);
