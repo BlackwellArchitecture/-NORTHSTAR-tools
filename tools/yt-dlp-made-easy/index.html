@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yt-dlp Made Easy - NORTHSTAR's tools</title>
+  <meta name="description" content="Easy CLI generator for yt-dlp. Paste a YouTube link, pick your settings, and copy clean, auto-sanitized commands for Terminal, CMD, PowerShell, and Fish.">
+  <meta name="theme-color" content="#002B36">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../images/icon.png">
+  <link rel="apple-touch-icon" href="../../images/icon.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="tool.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <img src="../../images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <span class="site-title"><a href="../../">NORTHSTAR's tools</a></span>
+          <span class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Tool Navigation Bar -->
+  <nav class="tool-nav-bar">
+    <div class="container nav-container">
+      <a href="../../" class="back-link">&larr; Back to NORTHSTAR's tools</a>
+      <button class="share-tool-btn" id="share-page-btn" type="button" title="Copy link to this tool">Copy Tool Link</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container tool-container">
+
+      <!-- Tool Header Block -->
+      <header class="tool-header-block">
+        <div class="tool-badge-row">
+          <span class="tool-badge">CLI Generator</span>
+          <span class="tool-badge">yt-dlp</span>
+          <span class="tool-badge">Auto-Sanitized</span>
+        </div>
+        <h1 class="tool-main-title">Yt-dlp Made Easy</h1>
+        <p class="tool-lead-desc">
+          Generate clean, ready-to-run <code>yt-dlp</code> download commands with a few clicks. Supports bash/zsh Terminal, Windows CMD, PowerShell, and Fish with automatic argument and URL sanitization.
+        </p>
+      </header>
+
+      <!-- Sticky / Prominent Generated Command Output -->
+      <section class="command-box-panel" id="command-output-section" aria-label="Generated Command Output">
+        <div class="command-box-header">
+          <div class="command-box-title">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="command-label">Generated Command</span>
+          </div>
+
+          <!-- Shell Selector Tabs -->
+          <div class="shell-tabs" role="tablist" aria-label="Terminal Shell Selection">
+            <button class="shell-tab active" data-shell="bash" role="tab" aria-selected="true" type="button" title="Linux, macOS, WSL, Zsh, Git Bash">
+              Terminal (Bash/Zsh)
+            </button>
+            <button class="shell-tab" data-shell="cmd" role="tab" aria-selected="false" type="button" title="Windows Command Prompt">
+              Windows CMD
+            </button>
+            <button class="shell-tab" data-shell="powershell" role="tab" aria-selected="false" type="button" title="Windows PowerShell & PowerShell 7">
+              PowerShell
+            </button>
+            <button class="shell-tab" data-shell="fish" role="tab" aria-selected="false" type="button" title="Fish Shell">
+              Fish
+            </button>
+            <button class="shell-tab" data-shell="termux" role="tab" aria-selected="false" type="button" title="Android Termux (Auto-routes to Shared Storage)">
+              Android (Termux)
+            </button>
+          </div>
+        </div>
+
+        <!-- Command Code Block -->
+        <div class="command-code-wrapper">
+          <pre class="command-pre"><code id="command-code" class="command-code">yt-dlp &quot;https://www.youtube.com/watch?v=dQw4w9WgXcQ&quot;</code></pre>
+        </div>
+
+        <!-- Command Action Toolbar -->
+        <div class="command-actions-toolbar">
+          <div class="command-actions-left">
+            <button class="btn btn-primary btn-copy" id="copy-cmd-btn" type="button">
+              <span id="copy-btn-text">Copy Command</span>
+            </button>
+            <button class="btn btn-secondary" id="toggle-multiline-btn" type="button" title="Toggle between single-line and multiline display">
+              Multiline: Off
+            </button>
+            <button class="btn btn-secondary" id="reset-all-btn" type="button" title="Reset all options to defaults">
+              Reset
+            </button>
+          </div>
+          
+          <div class="command-status" id="sanitization-status" title="Sanitization summary">
+            <span class="status-indicator clean"></span>
+            <span class="status-text" id="status-text">Clean &amp; Safe</span>
+          </div>
+        </div>
+
+        <!-- Sanitization Notes Notice (if any changes were auto-applied) -->
+        <div class="sanitization-alert" id="sanitization-alert" style="display: none;">
+          <span class="alert-icon">i</span>
+          <span id="sanitization-alert-msg">Auto-sanitized dangerous characters to prevent shell breakage.</span>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SECTION 1: THE BASICS (TOP SECTION)            -->
+      <!-- ============================================== -->
+      <section class="panel-card" id="basics-panel">
+        <h2 class="panel-title">
+          <span class="step-badge">1</span> The Basics
+        </h2>
+
+        <!-- URL Input Group with Auto-Sanitization -->
+        <div class="form-group">
+          <label for="video-url-input" class="form-label">
+            YouTube Link (Video, Short, or Playlist)
+            <span class="label-hint">Paste full or shortened URL</span>
+          </label>
+          <div class="url-input-group">
+            <input 
+              type="text" 
+              id="video-url-input" 
+              class="form-control url-input" 
+              placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..." 
+              value="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              autocomplete="off" 
+              spellcheck="false"
+            >
+            <button class="btn btn-secondary" id="paste-url-btn" type="button" title="Paste from clipboard">Paste</button>
+            <button class="btn btn-secondary" id="clear-url-btn" type="button" title="Clear input">Clear</button>
+          </div>
+          <div class="field-meta-row">
+            <span class="field-feedback" id="url-feedback">Valid YouTube URL detected</span>
+            <label class="inline-checkbox-label" title="Automatically strip tracking tags like ?si=..., &feature=share">
+              <input type="checkbox" id="clean-tracking-checkbox" checked>
+              <span>Auto-strip tracking params (<code>si</code>, <code>feature</code>)</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Quick One-Click Presets -->
+        <div class="form-group">
+          <label class="form-label">Quick Presets</label>
+          <div class="preset-pill-grid">
+            <button class="preset-pill active" type="button" data-preset="best-video">
+              Best Video + Audio
+            </button>
+            <button class="preset-pill" type="button" data-preset="1080p-mp4">
+              1080p MP4 (Universal)
+            </button>
+            <button class="preset-pill" type="button" data-preset="720p-compact">
+              720p Compact
+            </button>
+            <button class="preset-pill" type="button" data-preset="audio-mp3">
+              Audio Only (MP3 320k)
+            </button>
+            <button class="preset-pill" type="button" data-preset="audio-m4a">
+              Audio Only (M4A / AAC)
+            </button>
+            <button class="preset-pill" type="button" data-preset="archive-full">
+              Full Archive (+Subs &amp; Art)
+            </button>
+          </div>
+        </div>
+
+        <!-- Download Mode & Container Grid -->
+        <div class="form-grid-3">
+          <!-- Download Mode -->
+          <div class="form-group">
+            <label for="download-mode-select" class="form-label">Download Mode</label>
+            <select id="download-mode-select" class="form-control">
+              <option value="both" selected>Video + Audio (Merged)</option>
+              <option value="audio">Audio Only (Extract/Best)</option>
+              <option value="video-only">Video Only (Mute)</option>
+            </select>
+          </div>
+
+          <!-- Video Resolution Limit -->
+          <div class="form-group" id="group-video-resolution">
+            <label for="resolution-select" class="form-label">Max Resolution</label>
+            <select id="resolution-select" class="form-control">
+              <option value="best" selected>Best Available (Auto)</option>
+              <option value="2160">4K (2160p)</option>
+              <option value="1440">2K (1440p)</option>
+              <option value="1080">1080p (Full HD)</option>
+              <option value="720">720p (HD)</option>
+              <option value="480">480p (SD)</option>
+              <option value="360">360p (Low / Small)</option>
+            </select>
+          </div>
+
+          <!-- Target Container / Format -->
+          <div class="form-group" id="group-video-container">
+            <label for="container-select" class="form-label">Video Format / Container</label>
+            <select id="container-select" class="form-control">
+              <option value="mp4" selected>MP4 (Most Compatible)</option>
+              <option value="mkv">MKV (Best for multi-subs/chapters)</option>
+              <option value="webm">WebM (Open Web Format)</option>
+              <option value="auto">Auto / Source Container</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Audio Settings Row (Conditional visibility) -->
+        <div class="form-grid-2" id="group-audio-settings" style="display: none;">
+          <div class="form-group">
+            <label for="audio-format-select" class="form-label">Audio Format</label>
+            <select id="audio-format-select" class="form-control">
+              <option value="mp3" selected>MP3 (Universal)</option>
+              <option value="m4a">M4A / AAC (Apple &amp; YouTube native)</option>
+              <option value="opus">Opus (Modern &amp; High Efficiency)</option>
+              <option value="flac">FLAC (Lossless)</option>
+              <option value="wav">WAV (Uncompressed)</option>
+              <option value="best">Best Audio Stream (No re-encode)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="audio-quality-select" class="form-label">Audio Quality / Bitrate</label>
+            <select id="audio-quality-select" class="form-control">
+              <option value="0" selected>0 (Best VBR / ~320 kbps)</option>
+              <option value="320K">320 kbps (CBR)</option>
+              <option value="256K">256 kbps</option>
+              <option value="192K">192 kbps</option>
+              <option value="128K">128 kbps (Compact)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Output Filename and Folder (Basics) -->
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="output-template-preset" class="form-label">
+              Output Filename Format
+            </label>
+            <select id="output-template-preset" class="form-control">
+              <option value="title-id" selected>Title [ID].ext (Recommended)</option>
+              <option value="title-only">Title.ext</option>
+              <option value="channel-title">Channel - Title.ext</option>
+              <option value="date-title">YYYY-MM-DD - Title.ext</option>
+              <option value="playlist-indexed">Playlist Index - Title.ext</option>
+              <option value="custom">Custom Template...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="output-folder-input" class="form-label">
+              Output Folder <span class="label-hint">(Optional, defaults to current dir)</span>
+            </label>
+            <input 
+              type="text" 
+              id="output-folder-input" 
+              class="form-control" 
+              placeholder="e.g. ~/Downloads/YouTube or D:\Videos"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+        </div>
+
+        <!-- Custom template input box (Hidden by default unless custom is selected) -->
+        <div class="form-group" id="custom-template-group" style="display: none;">
+          <label for="custom-template-input" class="form-label">
+            Custom Filename Template <span class="label-hint">yt-dlp syntax</span>
+          </label>
+          <input 
+            type="text" 
+            id="custom-template-input" 
+            class="form-control" 
+            value="%(title)s [%(id)s].%(ext)s"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div class="template-variable-tags">
+            <button class="var-tag" type="button" data-var="%(title)s">%(title)s</button>
+            <button class="var-tag" type="button" data-var="%(id)s">%(id)s</button>
+            <button class="var-tag" type="button" data-var="%(uploader)s">%(uploader)s</button>
+            <button class="var-tag" type="button" data-var="%(upload_date)s">%(upload_date)s</button>
+            <button class="var-tag" type="button" data-var="%(resolution)s">%(resolution)s</button>
+            <button class="var-tag" type="button" data-var="%(playlist_index)s">%(playlist_index)s</button>
+            <button class="var-tag" type="button" data-var="%(ext)s">%(ext)s</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SECTION 2: COMMON MEDIA OPTIONS (MID LEVEL)    -->
+      <!-- ============================================== -->
+      <section class="panel-card" id="media-panel">
+        <h2 class="panel-title">
+          <span class="step-badge">2</span> Subtitles, Metadata &amp; Playlists
+        </h2>
+
+        <!-- Checkbox grid for common toggles -->
+        <div class="options-checkbox-grid">
+          <label class="checkbox-card">
+            <input type="checkbox" id="embed-subs-checkbox">
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Embed Subtitles</span>
+              <span class="checkbox-desc">Mux subtitles directly into the video file</span>
+            </div>
+          </label>
+
+          <label class="checkbox-card">
+            <input type="checkbox" id="auto-subs-checkbox">
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Include Auto-Generated Subs</span>
+              <span class="checkbox-desc">Download YouTube's AI captions if manual subs are missing</span>
+            </div>
+          </label>
+
+          <label class="checkbox-card">
+            <input type="checkbox" id="embed-thumbnail-checkbox">
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Embed Thumbnail</span>
+              <span class="checkbox-desc">Set video/audio cover art image (requires mutagen or ffmpeg)</span>
+            </div>
+          </label>
+
+          <label class="checkbox-card">
+            <input type="checkbox" id="embed-metadata-checkbox" checked>
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Embed Metadata &amp; Chapters</span>
+              <span class="checkbox-desc">Write title, artist, upload date, and chapter markers into media</span>
+            </div>
+          </label>
+
+          <label class="checkbox-card">
+            <input type="checkbox" id="no-playlist-checkbox" checked>
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Single Video Only</span>
+              <span class="checkbox-desc">Ignore playlist even if the link contains <code>&amp;list=...</code></span>
+            </div>
+          </label>
+
+          <label class="checkbox-card">
+            <input type="checkbox" id="write-description-checkbox">
+            <div class="checkbox-card-body">
+              <span class="checkbox-title">Save Video Description</span>
+              <span class="checkbox-desc">Write YouTube description to a separate <code>.description</code> file</span>
+            </div>
+          </label>
+        </div>
+
+        <!-- Conditional Subtitle Language Configuration -->
+        <div class="form-grid-2" id="subtitle-config-row" style="margin-top: 14px; display: none;">
+          <div class="form-group">
+            <label for="sub-lang-input" class="form-label">
+              Subtitle Languages
+              <span class="label-hint">Comma separated (e.g. <code>en,es,ja</code> or <code>all</code>)</span>
+            </label>
+            <input 
+              type="text" 
+              id="sub-lang-input" 
+              class="form-control" 
+              value="en.*,en"
+              placeholder="e.g. en,es,ja or all"
+              autocomplete="off"
+              spellcheck="false"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="sub-format-select" class="form-label">Subtitle Format Conversion</label>
+            <select id="sub-format-select" class="form-control">
+              <option value="srt" selected>SRT (SubRip - Most Compatible)</option>
+              <option value="vtt">VTT (WebVTT)</option>
+              <option value="ass">ASS (Advanced SubStation Alpha)</option>
+              <option value="best">Best / Native</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Conditional Playlist Range Configuration -->
+        <div class="form-grid-3" id="playlist-config-row" style="margin-top: 14px; display: none;">
+          <div class="form-group">
+            <label for="playlist-start-input" class="form-label">Playlist Start Item #</label>
+            <input type="number" id="playlist-start-input" class="form-control" placeholder="1" min="1">
+          </div>
+          <div class="form-group">
+            <label for="playlist-end-input" class="form-label">Playlist End Item #</label>
+            <input type="number" id="playlist-end-input" class="form-control" placeholder="10" min="1">
+          </div>
+          <div class="form-group">
+            <label for="playlist-items-input" class="form-label">Specific Items / Range</label>
+            <input type="text" id="playlist-items-input" class="form-control" placeholder="e.g. 1,3,5-8" autocomplete="off">
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SECTION 3: TECHNICAL & ADVANCED (BOTTOM)       -->
+      <!-- ============================================== -->
+      <section class="panel-card" id="technical-panel">
+        <div class="accordion-header" id="tech-accordion-btn" role="button" tabindex="0" aria-expanded="true">
+          <h2 class="panel-title" style="margin-bottom: 0;">
+            <span class="step-badge">3</span> Technical &amp; Advanced Options
+          </h2>
+          <span class="accordion-arrow" id="tech-accordion-arrow">&minus;</span>
+        </div>
+
+        <div class="accordion-content" id="tech-accordion-content">
+          <p class="section-subtext">
+            Fine-tune codecs, multi-threaded downloading, SponsorBlock, browser cookies, proxies, and custom flags. All values are automatically sanitized before being placed into shell commands.
+          </p>
+
+          <!-- SponsorBlock Integration -->
+          <div class="tech-subgroup">
+            <h3 class="tech-subgroup-title">SponsorBlock &amp; Trimming</h3>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="sponsorblock-select" class="form-label">
+                  SponsorBlock Action
+                  <span class="label-hint">Skip ads, intros, reminders automatically</span>
+                </label>
+                <select id="sponsorblock-select" class="form-control">
+                  <option value="none" selected>Disabled</option>
+                  <option value="remove-sponsor">Remove Sponsors Only</option>
+                  <option value="remove-all">Remove Sponsors, Intros, Outros &amp; Self-promo</option>
+                  <option value="mark-chapters">Mark with Chapters (Don't cut video)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="download-section-input" class="form-label">
+                  Time Range / Clip Download
+                  <span class="label-hint">e.g. <code>*01:30-03:45</code> or <code>*00:00-01:00</code></span>
+                </label>
+                <input 
+                  type="text" 
+                  id="download-section-input" 
+                  class="form-control" 
+                  placeholder="e.g. *01:15-02:40"
+                  autocomplete="off"
+                  spellcheck="false"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Performance & Download Acceleration -->
+          <div class="tech-subgroup">
+            <h3 class="tech-subgroup-title">Performance &amp; Speed Controls</h3>
+            <div class="form-grid-3">
+              <div class="form-group">
+                <label for="concurrent-fragments-select" class="form-label">
+                  Concurrent Fragments
+                  <span class="label-hint">Multi-threaded chunk downloads</span>
+                </label>
+                <select id="concurrent-fragments-select" class="form-control">
+                  <option value="1">1 (Single Stream - Default)</option>
+                  <option value="4" selected>4 (Recommended Speedup)</option>
+                  <option value="8">8 (High Speed)</option>
+                  <option value="16">16 (Aggressive)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="rate-limit-input" class="form-label">
+                  Rate Limit
+                  <span class="label-hint">Cap bandwidth (e.g. <code>5M</code>, <code>500K</code>)</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="rate-limit-input" 
+                  class="form-control" 
+                  placeholder="Unlimited (or e.g. 5M)"
+                  autocomplete="off"
+                  spellcheck="false"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="external-downloader-select" class="form-label">
+                  External Downloader
+                  <span class="label-hint">Accelerate with aria2c</span>
+                </label>
+                <select id="external-downloader-select" class="form-control">
+                  <option value="none" selected>Native yt-dlp</option>
+                  <option value="aria2c">aria2c (Multi-connection)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Codecs & Compatibility -->
+          <div class="tech-subgroup">
+            <h3 class="tech-subgroup-title">Video Codec Preference</h3>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="video-codec-select" class="form-label">
+                  Video Codec Priority
+                </label>
+                <select id="video-codec-select" class="form-control">
+                  <option value="auto" selected>Auto / Best Quality (yt-dlp default)</option>
+                  <option value="h264">Prioritize H.264 / AVC (Premiere / Old Hardware / TVs)</option>
+                  <option value="av1">Prioritize AV1 (Cutting-edge high efficiency)</option>
+                  <option value="vp9">Prioritize VP9 (High efficiency)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="geo-bypass-select" class="form-label">
+                  Geo Bypass / Country
+                  <span class="label-hint">Simulate country IP headers</span>
+                </label>
+                <select id="geo-bypass-select" class="form-control">
+                  <option value="none" selected>Default / Disabled</option>
+                  <option value="US">United States (US)</option>
+                  <option value="GB">United Kingdom (GB)</option>
+                  <option value="JP">Japan (JP)</option>
+                  <option value="DE">Germany (DE)</option>
+                  <option value="CA">Canada (CA)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Authentication, Browser Cookies & Proxies -->
+          <div class="tech-subgroup">
+            <h3 class="tech-subgroup-title">Cookies, Login &amp; Network Proxies</h3>
+            <div class="form-grid-2">
+              <div class="form-group">
+                <label for="cookies-browser-select" class="form-label">
+                  Pass Cookies from Browser
+                  <span class="label-hint">Bypasses age restrictions &amp; bot checks</span>
+                </label>
+                <select id="cookies-browser-select" class="form-control">
+                  <option value="none" selected>Disabled (No cookies)</option>
+                  <option value="chrome">Google Chrome</option>
+                  <option value="firefox">Mozilla Firefox</option>
+                  <option value="edge">Microsoft Edge</option>
+                  <option value="brave">Brave Browser</option>
+                  <option value="chromium">Chromium</option>
+                  <option value="safari">Safari (macOS)</option>
+                  <option value="custom-file">Custom cookies.txt file...</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="cookies-file-group" style="display: none;">
+                <label for="cookies-file-input" class="form-label">
+                  Path to cookies.txt
+                </label>
+                <input 
+                  type="text" 
+                  id="cookies-file-input" 
+                  class="form-control" 
+                  placeholder="e.g. cookies.txt or ~/cookies.txt"
+                  autocomplete="off"
+                  spellcheck="false"
+                >
+              </div>
+
+              <div class="form-group">
+                <label for="proxy-input" class="form-label">
+                  Proxy URL
+                  <span class="label-hint">HTTP / HTTPS / SOCKS5 proxy</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="proxy-input" 
+                  class="form-control" 
+                  placeholder="e.g. socks5://127.0.0.1:9050 or http://proxy:8080"
+                  autocomplete="off"
+                  spellcheck="false"
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Livestream Options & Additional Flags -->
+          <div class="tech-subgroup">
+            <h3 class="tech-subgroup-title">Livestreams &amp; Additional Arguments</h3>
+            <div class="options-checkbox-grid" style="margin-bottom: 14px;">
+              <label class="checkbox-card">
+                <input type="checkbox" id="live-from-start-checkbox">
+                <div class="checkbox-card-body">
+                  <span class="checkbox-title">Live From Start</span>
+                  <span class="checkbox-desc">Download active livestream from beginning instead of live edge</span>
+                </div>
+              </label>
+
+              <label class="checkbox-card">
+                <input type="checkbox" id="continue-checkbox" checked>
+                <div class="checkbox-card-body">
+                  <span class="checkbox-title">Resume Partially Downloaded (<code>-c</code>)</span>
+                  <span class="checkbox-desc">Resume interrupted downloads rather than starting over</span>
+                </div>
+              </label>
+            </div>
+
+            <div class="form-group">
+              <label for="custom-args-input" class="form-label">
+                Custom yt-dlp Flags / Extra Arguments
+                <span class="label-hint">Auto-sanitized to prevent broken quotes or illegal characters</span>
+              </label>
+              <input 
+                type="text" 
+                id="custom-args-input" 
+                class="form-control" 
+                placeholder="e.g. --no-warnings --write-comments"
+                autocomplete="off"
+                spellcheck="false"
+              >
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SECTION 4: EXPLANATION & CHEAT SHEET           -->
+      <!-- ============================================== -->
+      <section class="panel-card" id="explanation-panel">
+        <h2 class="panel-title">
+          <span class="step-badge">4</span> Command Breakdown &amp; Flags Explanation
+        </h2>
+        <p class="section-subtext">
+          Here is exactly what the arguments in your generated command mean:
+        </p>
+
+        <div class="breakdown-table-wrapper">
+          <table class="breakdown-table" id="breakdown-table">
+            <thead>
+              <tr>
+                <th style="width: 28%;">Argument / Flag</th>
+                <th>Purpose &amp; Behavior</th>
+              </tr>
+            </thead>
+            <tbody id="breakdown-tbody">
+              <!-- Dynamically populated based on active flags -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============================================== -->
+      <!-- SECTION 5: INSTALLATION GUIDE ACCORDION        -->
+      <!-- ============================================== -->
+      <section class="panel-card" id="install-guide-panel">
+        <h2 class="panel-title">
+          <span class="step-badge">?</span> How to Install yt-dlp &amp; FFmpeg
+        </h2>
+        <p class="section-subtext">
+          yt-dlp works best alongside FFmpeg (required for merging high-res video and audio tracks). Pick your system's quick one-liner below:
+        </p>
+
+        <div class="install-command-list">
+          <div class="install-row">
+            <div class="install-platform">Windows (Winget)</div>
+            <code class="install-code">winget install yt-dlp ffmpeg</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="winget install yt-dlp ffmpeg" type="button">Copy</button>
+          </div>
+
+          <div class="install-row">
+            <div class="install-platform">Windows (Scoop)</div>
+            <code class="install-code">scoop install yt-dlp ffmpeg</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="scoop install yt-dlp ffmpeg" type="button">Copy</button>
+          </div>
+
+          <div class="install-row">
+            <div class="install-platform">macOS (Homebrew)</div>
+            <code class="install-code">brew install yt-dlp ffmpeg</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="brew install yt-dlp ffmpeg" type="button">Copy</button>
+          </div>
+
+          <div class="install-row">
+            <div class="install-platform">Linux (Ubuntu / Debian)</div>
+            <code class="install-code">sudo apt install ffmpeg python3-pip &amp;&amp; pip install -U yt-dlp</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="sudo apt install ffmpeg python3-pip &amp;&amp; pip install -U yt-dlp" type="button">Copy</button>
+          </div>
+
+          <div class="install-row">
+            <div class="install-platform">Linux (Arch)</div>
+            <code class="install-code">sudo pacman -S yt-dlp ffmpeg</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="sudo pacman -S yt-dlp ffmpeg" type="button">Copy</button>
+          </div>
+
+          <div class="install-row">
+            <div class="install-platform">Android (Termux)</div>
+            <code class="install-code">pkg update &amp;&amp; pkg install python ffmpeg &amp;&amp; pip install -U yt-dlp</code>
+            <button class="btn btn-secondary install-copy-btn" data-copy="pkg update &amp;&amp; pkg install python ffmpeg &amp;&amp; pip install -U yt-dlp" type="button">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Protip Callout -->
+      <aside class="protip-box">
+        <div class="protip-box-title">Protip</div>
+        <p class="protip-box-text">
+          YouTube serves separate video and audio streams for 1080p, 1440p, and 4K resolutions. Installing <code>ffmpeg</code> allows yt-dlp to automatically merge the highest quality video and audio tracks seamlessly into an MP4 or MKV file without quality loss.
+        </p>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools</span>
+        <a href="../../">Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Script -->
+  <script src="tool.js"></script>
+</body>
+</html>

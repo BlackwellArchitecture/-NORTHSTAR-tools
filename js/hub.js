@@ -5,6 +5,14 @@
 
 const TOOLS = [
   {
+    id: "yt-dlp-made-easy",
+    title: "Yt-dlp Made Easy",
+    description: "Simple yet powerful CLI generator for yt-dlp. Customize video resolution, audio formats, containers, and advanced options with auto-sanitization across Terminal, CMD, PowerShell, and Fish.",
+    path: "tools/yt-dlp-made-easy/",
+    tag: "CLI Generator",
+    date: "2024"
+  },
+  {
     id: "hunt-20-pizza-place-trophy",
     title: "Hunt: 20 Pizza Place Trophy Brute Forcer",
     description: "Calculates all 24 emoji permutations for the 20-trophy code in Work at a Pizza Place and walks you through testing them randomly until you find the working code.",
