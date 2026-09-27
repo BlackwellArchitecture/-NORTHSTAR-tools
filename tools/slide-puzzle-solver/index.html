@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox Slide Puzzle Solver (NxN) - NORTHSTAR's tools</title>
+  <meta name="description" content="Step-by-step solver and guide for arbitrary NxN sliding puzzles and Roblox floor slide puzzles with custom image slicing, move guidance, and parity checking.">
+  <meta name="theme-color" content="#002B36">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../images/icon.png">
+  <link rel="apple-touch-icon" href="../../images/icon.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="tool.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="header-content">
+        <img src="../../images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <span class="site-title"><a href="../../">NORTHSTAR's tools</a></span>
+          <span class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Tool Navigation Bar -->
+  <nav class="tool-nav-bar">
+    <div class="container tool-wide-container" style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="../../" class="back-link">&larr; Back to NORTHSTAR's tools</a>
+      <span style="font-size: 0.85rem; color: var(--text-muted);">Roblox Slide Puzzle Guide</span>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container tool-wide-container">
+
+      <!-- Tool Header Block -->
+      <div class="tool-header-block">
+        <h1 class="tool-main-title">
+          <span>Roblox Slide Puzzle Solver</span>
+          <span class="badge-roblox">Roblox 8×8</span>
+          <span class="badge-universal">Any N×N</span>
+        </h1>
+        <p class="tool-lead-desc">
+          Easily solve large image slide puzzles (including 8×8 Roblox floor puzzles). Split any image into sections, arrange the tiles to match your scrambled in-game board, and let the algorithm guide you move-by-move until the picture is completely reconstructed.
+        </p>
+      </div>
+
+      <!-- Config & Slicing Panel -->
+      <section class="panel-card" id="config-panel">
+        <div class="panel-title">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="step-badge">Step 1</span>
+            <span>Choose Grid Size & Reference Image</span>
+          </div>
+        </div>
+
+        <div class="config-row">
+          <!-- Grid Size Group -->
+          <div class="config-group">
+            <span class="config-label">Grid Size (N × N)</span>
+            <div class="size-pill-group">
+              <button class="size-pill active" data-size="8">8×8 (Roblox)</button>
+              <button class="size-pill" data-size="3">3×3</button>
+              <button class="size-pill" data-size="4">4×4</button>
+              <button class="size-pill" data-size="5">5×5</button>
+              <button class="size-pill" data-size="6">6×6</button>
+              <button class="size-pill" data-size="custom">Custom</button>
+              <input type="number" id="custom-n-input" class="custom-n-input" min="2" max="10" value="8" title="Custom N (2-10)">
+            </div>
+          </div>
+
+          <!-- Image Presets Group -->
+          <div class="config-group" style="margin-left: auto;">
+            <span class="config-label">Image Source</span>
+            <div class="preset-buttons-row">
+              <button class="btn-secondary preset-btn active" id="preset-roblox">
+                🤖 Roblox Noob Puzzle
+              </button>
+              <button class="btn-secondary preset-btn" id="preset-numbers">
+                🔢 Numbers Only
+              </button>
+              <button class="btn-secondary" id="btn-upload-img">
+                📁 Upload Custom Image
+              </button>
+              <input type="file" id="image-upload-input" class="file-input-hidden" accept="image/*">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Two-Column Solving Workspace -->
+      <div class="two-col-layout">
+
+        <!-- Left Column: The Interactive Board & Step Guidance -->
+        <div class="main-board-column">
+
+          <section class="panel-card">
+            <div class="panel-title">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="step-badge">Step 2</span>
+                <span>Match In-Game Board & Solve</span>
+              </div>
+            </div>
+
+            <!-- Real-time Parity Status Banner -->
+            <div class="status-banner is-solvable" id="status-banner">
+              <span>Checking puzzle solvability...</span>
+            </div>
+
+            <!-- Board Action Toolbar -->
+            <div class="board-toolbar">
+              <div class="toolbar-group">
+                <button class="btn-primary" id="solve-btn">
+                  <span>⚡ Solve Puzzle</span>
+                </button>
+                <button class="btn-secondary" id="scramble-btn" title="Scramble board with legal moves to test solver">
+                  🎲 Scramble (Test)
+                </button>
+                <button class="btn-secondary" id="reset-btn" title="Reset board to original solved state">
+                  🔄 Reset Solved
+                </button>
+              </div>
+
+              <div class="toolbar-group">
+                <button class="btn-secondary" id="set-blank-btn" title="Click to designate which board slot is the empty/blank space">
+                  🔲 Set Blank Slot
+                </button>
+                <button class="btn-secondary" id="rotate-btn" title="Rotate board 90° clockwise to match your Roblox camera angle">
+                  ↻ Rotate Board
+                </button>
+                <button class="btn-secondary active" id="toggle-numbers-btn" title="Toggle tile numbers overlay">
+                  # Numbers
+                </button>
+              </div>
+            </div>
+
+            <!-- Puzzle Board Container with Coordinate Rulers -->
+            <div class="puzzle-board-container">
+              <div class="board-with-coords">
+                <!-- Top Column Coordinates (1..N) -->
+                <div class="col-coords-header" id="col-coords-header"></div>
+
+                <!-- Left Row Coordinates (1..N) -->
+                <div class="row-coords-header" id="row-coords-header"></div>
+
+                <!-- Main CSS Grid Board -->
+                <div class="puzzle-board" id="puzzle-board"></div>
+              </div>
+            </div>
+
+            <!-- Step-by-Step Playback Guide (Appears when solved) -->
+            <div class="playback-card" id="playback-card" style="display: none;">
+              <!-- Current Move Callout -->
+              <div class="instruction-banner">
+                <div class="instruction-step-num" id="instruction-step-num">
+                  <span>Solving Row 1</span>
+                  <span>Move 1 of 280</span>
+                </div>
+                <div class="instruction-main-text" id="instruction-main-text">
+                  👉 Slide <strong>Tile #24</strong> <span class="dir-highlight">UP</span> into the blank
+                </div>
+                <div class="instruction-sub-text" id="instruction-sub-text">
+                  🎮 In Roblox: Stand on Tile <strong>[Row 6, Col 4]</strong> and press <span class="roblox-key-badge">E</span> to slide UP.
+                </div>
+              </div>
+
+              <!-- Scrubber Timeline -->
+              <div class="scrub-container">
+                <input type="range" class="step-scrubber" id="step-scrubber" min="0" max="100" value="0">
+                <span class="scrub-label" id="scrub-label">0 / 0</span>
+              </div>
+
+              <!-- Playback Controls -->
+              <div class="playback-controls">
+                <div class="playback-btn-group">
+                  <button class="ctrl-btn" id="start-btn" title="Jump to start">|&lt;</button>
+                  <button class="ctrl-btn" id="prev-btn" title="Previous move (Left Arrow)">&lt; Prev</button>
+                  <button class="ctrl-btn" id="play-btn" title="Play / Pause auto-step (Spacebar)">▶ Play</button>
+                  <button class="ctrl-btn" id="next-btn" title="Next move (Right Arrow)">Next &gt;</button>
+                  <button class="ctrl-btn" id="end-btn" title="Jump to solved state">&gt;|</button>
+                </div>
+
+                <div class="playback-btn-group">
+                  <label for="speed-select" style="font-size:0.8rem; color:var(--text-muted);">Speed:</label>
+                  <select class="speed-select" id="speed-select">
+                    <option value="1500">Slow (1.5s)</option>
+                    <option value="800" selected>Normal (0.8s)</option>
+                    <option value="400">Fast (0.4s)</option>
+                    <option value="150">Ultra Fast (0.15s)</option>
+                  </select>
+                  <button class="ctrl-btn" id="copy-steps-btn" title="Copy text instructions to clipboard">
+                    📋 Copy Steps
+                  </button>
+                </div>
+              </div>
+
+              <!-- Collapsible Full Move List -->
+              <details class="steps-details">
+                <summary class="steps-summary">📜 View Full Move List (<span id="steps-total-count">0</span> moves)</summary>
+                <div class="steps-scroll-list" id="steps-scroll-list"></div>
+              </details>
+            </div>
+
+          </section>
+
+        </div>
+
+        <!-- Right Column: Goal Reference & Tile Palette Drawer -->
+        <aside class="sidebar-panel">
+
+          <!-- Goal / Reference Image Preview -->
+          <div class="panel-card" style="padding: 16px;">
+            <div class="panel-title" style="margin-bottom: 8px;">
+              <span>Goal Reference</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+              Completed picture. Tile #1 is top-left, Tile #64 is bottom-right.
+            </p>
+            <div class="reference-box">
+              <img id="reference-img-preview" class="reference-img-preview" alt="Solved goal reference">
+            </div>
+          </div>
+
+          <!-- Tile Picker Palette -->
+          <div class="panel-card" style="padding: 16px;">
+            <div class="palette-header">
+              <span class="palette-title">Tile Picker Palette</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+              Click any cell on the board, then click the tile below that belongs there.
+            </p>
+            <input 
+              type="text" 
+              id="palette-search" 
+              class="palette-search" 
+              placeholder="Search tile # (e.g. 15)..."
+              autocomplete="off"
+            >
+            <div class="palette-grid" id="palette-grid"></div>
+          </div>
+
+        </aside>
+
+      </div>
+
+      <!-- Quick Tips & Help Section -->
+      <section class="panel-card" style="margin-top: 10px;">
+        <h2 class="panel-title" style="font-size: 1rem;">
+          <span>💡 How to Solve the Roblox Puzzle</span>
+        </h2>
+        <div style="font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;">
+          <ul style="padding-left: 20px;">
+            <li><strong>How to arrange tiles:</strong> Click any two tiles on the board to swap them, or click a cell and choose its matching tile from the Tile Picker Palette on the right.</li>
+            <li><strong>Blank Space:</strong> Click <em>Set Blank Slot</em> and click the cell where the dark metal floor plate is located in your game.</li>
+            <li><strong>Camera Orientation:</strong> If your Roblox character is facing the puzzle from a different side, click <em>Rotate Board (↻)</em> to align the grid with your screen.</li>
+            <li><strong>Parity Auto-Fix:</strong> If you accidentally swap tiles while copying from Roblox, sliding puzzles have parity. Click <em>Auto-Fix Parity</em> if an unsolvable warning appears.</li>
+            <li><strong>Step Navigation:</strong> Use <kbd>Spacebar</kbd> to Play/Pause, and <kbd>&rarr;</kbd> / <kbd>&larr;</kbd> arrow keys to advance through each slide step-by-step!</li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container tool-wide-container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools</span>
+        <span>Hosted on Vercel</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="solver.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

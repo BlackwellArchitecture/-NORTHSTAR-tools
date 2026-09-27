@@ -19,6 +19,14 @@ const TOOLS = [
     path: "tools/hunt-20-pizza-place-trophy/",
     tag: "Roblox Hunt",
     date: "2024"
+  },
+  {
+    id: "slide-puzzle-solver",
+    title: "Roblox Slide Puzzle Solver (NxN)",
+    description: "Step-by-step solver and guide for arbitrary NxN sliding puzzles and Roblox floor puzzles. Slices any image into sections, guides each slide move, includes presets, parity checking, and board rotation.",
+    path: "tools/slide-puzzle-solver/",
+    tag: "Roblox Puzzle",
+    date: "2024"
   }
 ];
 
