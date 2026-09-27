@@ -17,11 +17,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // Status & Guidance Elements
   const statusBannerEl = document.getElementById("status-banner");
   const solveBtn = document.getElementById("solve-btn");
+  const clearBoardBtn = document.getElementById("clear-board-btn");
+  const clearSlotBtn = document.getElementById("clear-slot-btn");
+  const fillRemainingBtn = document.getElementById("fill-remaining-btn");
   const scrambleBtn = document.getElementById("scramble-btn");
   const resetBtn = document.getElementById("reset-btn");
   const rotateBtn = document.getElementById("rotate-btn");
   const setBlankBtn = document.getElementById("set-blank-btn");
   const toggleNumbersBtn = document.getElementById("toggle-numbers-btn");
+
+  // Palette Controls
+  const autoAdvanceChk = document.getElementById("auto-advance-chk");
+  const hidePlacedChk = document.getElementById("hide-placed-chk");
+  const paletteSetBlankBtn = document.getElementById("palette-set-blank-btn");
+  const placedTilesCountEl = document.getElementById("placed-tiles-count");
 
   // Playback Elements
   const playbackPanel = document.getElementById("playback-card");
@@ -124,12 +133,19 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Board Toolbar Actions
+    clearBoardBtn?.addEventListener("click", () => clearBoard());
+    clearSlotBtn?.addEventListener("click", () => clearSelectedSlot());
+    fillRemainingBtn?.addEventListener("click", () => fillRemainingSlots());
     scrambleBtn?.addEventListener("click", () => scrambleBoard(N * 15));
     resetBtn?.addEventListener("click", () => resetBoardToSolved());
     rotateBtn?.addEventListener("click", () => rotateBoard());
     setBlankBtn?.addEventListener("click", () => toggleBlankMode());
     toggleNumbersBtn?.addEventListener("click", () => toggleNumbersOverlay());
     solveBtn?.addEventListener("click", () => executeSolve());
+
+    // Palette Extra Actions
+    hidePlacedChk?.addEventListener("change", () => renderPalette(paletteSearchInput?.value || ""));
+    paletteSetBlankBtn?.addEventListener("click", () => placeBlankIntoSelected());
 
     // Playback Controls
     prevBtn?.addEventListener("click", () => stepMove(-1));
@@ -161,6 +177,14 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener("keydown", (e) => {
       if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
       if (solutionMoves.length === 0) return;
+
+      if (e.key === "Delete" || e.key === "Backspace") {
+        if (selectedSlotIndex !== null && solutionMoves.length === 0) {
+          e.preventDefault();
+          clearSelectedSlot();
+          return;
+        }
+      }
 
       if (e.key === "ArrowRight") {
         e.preventDefault();
@@ -384,15 +408,19 @@ document.addEventListener("DOMContentLoaded", () => {
       tileEl.dataset.slot = idx;
       tileEl.dataset.tile = tileId;
 
-      if (tileId === blankTileId) {
+      if (tileId === null) {
+        tileEl.classList.add("is-empty-slot");
+        tileEl.innerHTML = `<span class="empty-slot-plus">+</span><span class="empty-slot-coord">(${row + 1},${col + 1})</span>`;
+        tileEl.title = `Empty slot [Row ${row + 1}, Col ${col + 1}] - Click to select & assign tile (Right-click to clear)`;
+      } else if (tileId === blankTileId) {
         tileEl.classList.add("is-blank");
-        tileEl.title = `Blank space at Row ${row + 1}, Col ${col + 1}`;
+        tileEl.title = `Blank space at Row ${row + 1}, Col ${col + 1} (Right-click to clear)`;
       } else {
         const tileInfo = tilesData.find(t => t.id === tileId);
         if (tileInfo) {
           tileEl.style.backgroundImage = `url("${tileInfo.dataUrl}")`;
         }
-        tileEl.title = `Tile #${tileId} at Row ${row + 1}, Col ${col + 1}`;
+        tileEl.title = `Tile #${tileId} at Row ${row + 1}, Col ${col + 1} (Right-click to clear)`;
 
         // Number Badge
         if (showNumbers) {
@@ -402,6 +430,17 @@ document.addEventListener("DOMContentLoaded", () => {
           tileEl.appendChild(badge);
         }
       }
+
+      // Contextmenu (Right-click) to delete/clear slot
+      tileEl.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        if (solutionMoves.length > 0) return;
+        currentBoard[idx] = null;
+        selectedSlotIndex = idx;
+        renderBoard();
+        renderPalette();
+        updateSolvabilityBanner();
+      });
 
       // Selection state
       if (selectedSlotIndex === idx) {
@@ -458,11 +497,23 @@ document.addEventListener("DOMContentLoaded", () => {
     paletteGridEl.innerHTML = "";
     const query = filterText.toLowerCase().trim();
 
-    tilesData.forEach(tile => {
-      if (query && !tile.id.toString().includes(query)) return;
+    // Update placed count in header badge
+    const placedCount = currentBoard.filter(t => t !== null).length;
+    if (placedTilesCountEl) {
+      placedTilesCountEl.textContent = `${placedCount} / ${N * N} placed`;
+      placedTilesCountEl.style.backgroundColor = (placedCount === N * N) ? "rgba(133,153,0,0.2)" : "var(--bg-inset)";
+      placedTilesCountEl.style.color = (placedCount === N * N) ? "#a7c000" : "var(--accent)";
+    }
 
+    const hidePlaced = hidePlacedChk?.checked ?? false;
+
+    tilesData.forEach(tile => {
       const isPlaced = currentBoard.includes(tile.id);
       const isBlank = (tile.id === blankTileId);
+
+      // Filter options
+      if (hidePlaced && isPlaced) return;
+      if (query && !tile.id.toString().includes(query)) return;
 
       const itemEl = document.createElement("div");
       itemEl.className = "palette-item";
@@ -470,15 +521,34 @@ document.addEventListener("DOMContentLoaded", () => {
       if (isBlank) itemEl.classList.add("is-blank-item");
 
       itemEl.style.backgroundImage = `url("${tile.dataUrl}")`;
-      itemEl.title = tile.label + (isPlaced ? " (Placed)" : " (Available)");
+      itemEl.title = tile.label + (isPlaced ? " (Placed on board)" : " (Available)");
 
       const badge = document.createElement("span");
       badge.className = "palette-badge";
       badge.textContent = isBlank ? "BLANK" : `#${tile.id}`;
       itemEl.appendChild(badge);
 
+      if (isPlaced) {
+        const checkBadge = document.createElement("span");
+        checkBadge.className = "palette-placed-check";
+        checkBadge.textContent = "✓";
+        itemEl.appendChild(checkBadge);
+      }
+
       itemEl.addEventListener("click", () => {
-        if (selectedSlotIndex !== null) {
+        if (selectedSlotIndex === null) {
+          // If no slot selected, find first empty slot
+          const firstEmpty = currentBoard.indexOf(null);
+          if (firstEmpty !== -1) {
+            assignTileToSlot(firstEmpty, tile.id);
+          } else {
+            // All slots full: if tile is placed, select its slot on board
+            if (isPlaced) {
+              selectedSlotIndex = currentBoard.indexOf(tile.id);
+              renderBoard();
+            }
+          }
+        } else {
           assignTileToSlot(selectedSlotIndex, tile.id);
         }
       });
@@ -498,7 +568,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (isSettingBlank) {
       // Designate clicked slot's tile as the blank
-      blankTileId = currentBoard[slotIdx];
+      if (currentBoard[slotIdx] !== null) {
+        blankTileId = currentBoard[slotIdx];
+      } else {
+        currentBoard[slotIdx] = blankTileId;
+      }
       isSettingBlank = false;
       setBlankBtn.classList.remove("active");
       renderBoard();
@@ -516,9 +590,10 @@ document.addEventListener("DOMContentLoaded", () => {
       selectedSlotIndex = null;
       renderBoard();
     } else {
-      // Second selection: SWAP the two slots!
+      // Second selection: SWAP the two slots (even if one is empty!)
       swapBoardSlots(selectedSlotIndex, slotIdx);
-      selectedSlotIndex = null;
+      selectedSlotIndex = slotIdx; // Keep newly swapped-into slot selected for easy workflow
+      renderBoard();
     }
   }
 
@@ -543,23 +618,113 @@ document.addEventListener("DOMContentLoaded", () => {
    * Assign a chosen tile from palette to a board slot
    */
   function assignTileToSlot(slotIdx, tileId) {
-    // If tileId already exists elsewhere, swap it
     const existingIdx = currentBoard.indexOf(tileId);
-    if (existingIdx !== -1) {
-      const oldVal = currentBoard[slotIdx];
-      currentBoard[slotIdx] = tileId;
-      currentBoard[existingIdx] = oldVal;
-    } else {
-      currentBoard[slotIdx] = tileId;
-    }
+    const oldVal = currentBoard[slotIdx];
 
-    selectedSlotIndex = null;
+    // If tileId already exists elsewhere, swap with old value
+    if (existingIdx !== -1 && existingIdx !== slotIdx) {
+      currentBoard[existingIdx] = oldVal;
+    }
+    currentBoard[slotIdx] = tileId;
+
     solutionMoves = [];
     playbackPanel.style.display = "none";
 
+    // Auto-advance to next empty slot if enabled
+    const autoAdvance = autoAdvanceChk?.checked ?? true;
+    if (autoAdvance) {
+      let nextEmpty = null;
+      for (let i = 1; i <= N * N; i++) {
+        const candidate = (slotIdx + i) % (N * N);
+        if (currentBoard[candidate] === null) {
+          nextEmpty = candidate;
+          break;
+        }
+      }
+      selectedSlotIndex = nextEmpty;
+    } else {
+      selectedSlotIndex = null;
+    }
+
     renderBoard();
-    renderPalette();
+    renderPalette(paletteSearchInput?.value || "");
     updateSolvabilityBanner();
+  }
+
+  /**
+   * Delete / Clear the entire board configuration
+   */
+  function clearBoard() {
+    stopPlay();
+    solutionMoves = [];
+    playbackPanel.style.display = "none";
+    currentBoard = new Array(N * N).fill(null);
+    selectedSlotIndex = 0; // select top-left slot so user can immediately click tiles from palette
+    renderBoard();
+    renderPalette(paletteSearchInput?.value || "");
+    updateSolvabilityBanner();
+  }
+
+  /**
+   * Clear the currently selected slot back to empty
+   */
+  function clearSelectedSlot() {
+    if (selectedSlotIndex === null) {
+      // If nothing selected, find last placed tile
+      const lastPlaced = currentBoard.map((val, idx) => ({ val, idx })).filter(item => item.val !== null).pop();
+      if (lastPlaced) {
+        currentBoard[lastPlaced.idx] = null;
+        selectedSlotIndex = lastPlaced.idx;
+      }
+    } else {
+      currentBoard[selectedSlotIndex] = null;
+    }
+    solutionMoves = [];
+    playbackPanel.style.display = "none";
+    renderBoard();
+    renderPalette(paletteSearchInput?.value || "");
+    updateSolvabilityBanner();
+  }
+
+  /**
+   * Fill remaining unassigned slots from solved order
+   */
+  function fillRemainingSlots() {
+    stopPlay();
+    solutionMoves = [];
+    playbackPanel.style.display = "none";
+
+    const placedSet = new Set(currentBoard.filter(t => t !== null));
+    const missingTiles = [];
+    for (let i = 1; i <= N * N; i++) {
+      if (!placedSet.has(i)) {
+        missingTiles.push(i);
+      }
+    }
+
+    let mIdx = 0;
+    for (let slot = 0; slot < N * N; slot++) {
+      if (currentBoard[slot] === null && mIdx < missingTiles.length) {
+        currentBoard[slot] = missingTiles[mIdx++];
+      }
+    }
+
+    selectedSlotIndex = null;
+    renderBoard();
+    renderPalette(paletteSearchInput?.value || "");
+    updateSolvabilityBanner();
+  }
+
+  /**
+   * Place blank tile into the currently selected slot
+   */
+  function placeBlankIntoSelected() {
+    let target = selectedSlotIndex;
+    if (target === null) {
+      const firstEmpty = currentBoard.indexOf(null);
+      target = (firstEmpty !== -1) ? firstEmpty : (N * N - 1);
+    }
+    assignTileToSlot(target, blankTileId);
   }
 
   /**
@@ -618,6 +783,11 @@ document.addEventListener("DOMContentLoaded", () => {
     solutionMoves = [];
     playbackPanel.style.display = "none";
 
+    // If board has any empty/null slots, fill them before scrambling
+    if (currentBoard.some(t => t === null)) {
+      fillRemainingSlots();
+    }
+
     const dirs = [
       { r: -1, c: 0 },
       { r: 1, c: 0 },
@@ -654,7 +824,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     renderBoard();
-    renderPalette();
+    renderPalette(paletteSearchInput?.value || "");
     updateSolvabilityBanner();
   }
 
@@ -671,9 +841,10 @@ document.addEventListener("DOMContentLoaded", () => {
       currentBoard.push(i);
     }
     blankTileId = N * N;
+    selectedSlotIndex = null;
 
     renderBoard();
-    renderPalette();
+    renderPalette(paletteSearchInput?.value || "");
     updateSolvabilityBanner();
   }
 
@@ -682,6 +853,20 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   function updateSolvabilityBanner() {
     if (!statusBannerEl) return;
+
+    // Check placed count
+    const placedCount = currentBoard.filter(t => t !== null).length;
+    if (placedCount < N * N) {
+      const missingCount = N * N - placedCount;
+      statusBannerEl.className = "status-banner is-incomplete";
+      statusBannerEl.innerHTML = `
+        <span>📝 <strong>Manual Configuration:</strong> ${placedCount} of ${N * N} tiles placed (${missingCount} empty). Click an empty slot to place tiles from the palette.</span>
+        <button class="status-action-btn" id="banner-fill-btn">⚡ Fill Remaining</button>
+      `;
+      document.getElementById("banner-fill-btn")?.addEventListener("click", () => fillRemainingSlots());
+      solveBtn.disabled = true;
+      return;
+    }
 
     // Check if board contains unique valid tiles
     const tileSet = new Set(currentBoard);

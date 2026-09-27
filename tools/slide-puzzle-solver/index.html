@@ -122,20 +122,29 @@
                 <button class="btn-primary" id="solve-btn">
                   <span>⚡ Solve Puzzle</span>
                 </button>
-                <button class="btn-secondary" id="scramble-btn" title="Scramble board with legal moves to test solver">
-                  🎲 Scramble (Test)
+                <button class="btn-danger" id="clear-board-btn" title="Delete current configuration and empty all tiles to reconfigure manually">
+                  🗑️ Clear Board
                 </button>
-                <button class="btn-secondary" id="reset-btn" title="Reset board to original solved state">
-                  🔄 Reset Solved
+                <button class="btn-secondary" id="clear-slot-btn" title="Remove tile from selected cell back to palette">
+                  ❌ Clear Slot
+                </button>
+                <button class="btn-secondary" id="fill-remaining-btn" title="Fill any remaining empty cells from solved state">
+                  ⚡ Fill Remaining
                 </button>
               </div>
 
               <div class="toolbar-group">
+                <button class="btn-secondary" id="scramble-btn" title="Scramble board with legal moves to test solver">
+                  🎲 Scramble
+                </button>
+                <button class="btn-secondary" id="reset-btn" title="Reset board to original solved state">
+                  🔄 Reset Solved
+                </button>
                 <button class="btn-secondary" id="set-blank-btn" title="Click to designate which board slot is the empty/blank space">
                   🔲 Set Blank Slot
                 </button>
                 <button class="btn-secondary" id="rotate-btn" title="Rotate board 90° clockwise to match your Roblox camera angle">
-                  ↻ Rotate Board
+                  ↻ Rotate
                 </button>
                 <button class="btn-secondary active" id="toggle-numbers-btn" title="Toggle tile numbers overlay">
                   # Numbers
@@ -234,10 +243,24 @@
           <div class="panel-card" style="padding: 16px;">
             <div class="palette-header">
               <span class="palette-title">Tile Picker Palette</span>
+              <span class="step-badge" id="placed-tiles-count">0 / 64 placed</span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
-              Click any cell on the board, then click the tile below that belongs there.
+              Click an empty cell on the board, then click the matching tile below.
             </p>
+            <div class="palette-controls-row">
+              <label class="palette-filter-group" title="Automatically move selection to next slot when a tile is placed">
+                <input type="checkbox" id="auto-advance-chk" checked>
+                <span>Auto-advance slot</span>
+              </label>
+              <label class="palette-filter-group" title="Only display tiles not yet placed on the board">
+                <input type="checkbox" id="hide-placed-chk">
+                <span>Hide placed</span>
+              </label>
+            </div>
+            <button class="palette-blank-btn" id="palette-set-blank-btn" title="Place empty sliding tile into the currently selected cell">
+              🔲 Place Blank Space Into Slot
+            </button>
             <input 
               type="text" 
               id="palette-search" 

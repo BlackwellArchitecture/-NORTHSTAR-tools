@@ -406,6 +406,47 @@
   filter: brightness(1.2);
 }
 
+/* Empty unassigned slot */
+.puzzle-tile.is-empty-slot {
+  background-color: rgba(7, 54, 66, 0.4) !important;
+  background-image: none !important;
+  border: 1px dashed rgba(42, 161, 152, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.puzzle-tile.is-empty-slot:hover {
+  background-color: rgba(42, 161, 152, 0.15) !important;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.puzzle-tile.is-empty-slot.is-selected {
+  outline: 3px solid #ffcc00 !important;
+  background-color: rgba(255, 204, 0, 0.15) !important;
+  border-color: #ffcc00 !important;
+  box-shadow: 0 0 10px rgba(255, 204, 0, 0.4);
+}
+
+.empty-slot-plus {
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+.empty-slot-coord {
+  font-size: 0.65rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
 /* Blank Tile (Roblox plate style) */
 .puzzle-tile.is-blank {
   background-color: #0a1114 !important;
@@ -420,6 +461,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.puzzle-tile.is-blank.is-selected {
+  outline: 3px solid #ffcc00 !important;
 }
 
 .puzzle-tile.is-blank::after {
@@ -714,6 +759,51 @@
   margin-bottom: 10px;
 }
 
+.palette-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.palette-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.palette-filter-group input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.palette-blank-btn {
+  width: 100%;
+  margin-bottom: 8px;
+  background-color: #0a1114;
+  border: 1px dashed var(--accent);
+  color: #a7c000;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s ease;
+}
+
+.palette-blank-btn:hover {
+  background-color: #142830;
+  border-color: #ffcc00;
+}
+
 .palette-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -742,8 +832,13 @@
 }
 
 .palette-item.is-placed {
-  opacity: 0.45;
-  filter: grayscale(0.5);
+  opacity: 0.35;
+  filter: grayscale(0.7);
+}
+
+.palette-item.is-placed:hover {
+  opacity: 0.75;
+  filter: grayscale(0.2);
 }
 
 .palette-item.is-active-choice {
@@ -761,6 +856,18 @@
   font-size: 0.65rem;
   padding: 0 3px;
   border-radius: 2px;
+}
+
+.palette-placed-check {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background-color: rgba(133, 153, 0, 0.9);
+  color: #fff;
+  font-size: 0.65rem;
+  padding: 0 3px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
 }
 
 /* Steps list accordion */
