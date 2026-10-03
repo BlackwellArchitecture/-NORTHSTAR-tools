@@ -19,11 +19,11 @@
 
   // Comparison Elements
   const comparisonContainer = document.getElementById("comparison-container");
+  const imageStage = document.getElementById("image-stage");
   const processedCanvas = document.getElementById("processed-canvas");
   const originalCanvas = document.getElementById("original-canvas");
-  const beforeOverlay = document.getElementById("before-overlay");
   const sliderDivider = document.getElementById("slider-divider");
-  const sliderHandle = sliderDivider.querySelector(".slider-handle");
+  const sliderHandle = document.getElementById("slider-handle") || sliderDivider.querySelector(".slider-handle");
 
   // Split control buttons
   const splitBtn25 = document.getElementById("split-btn-25");
@@ -150,8 +150,18 @@
     window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("pointercancel", onPointerUp);
 
-    // Sync scaling on window resize
-    window.addEventListener("resize", syncOverlayCanvasDimensions);
+    // Keyboard arrow accessibility on slider handle
+    if (sliderHandle) {
+      sliderHandle.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+          e.preventDefault();
+          setSplitPosition(currentSplitRatio - 0.05);
+        } else if (e.key === "ArrowRight") {
+          e.preventDefault();
+          setSplitPosition(currentSplitRatio + 0.05);
+        }
+      });
+    }
 
     // Exports
     btnDownloadPng.addEventListener("click", () => exportImage("png"));
@@ -340,9 +350,6 @@
 
     // Default to 50% split
     setSplitPosition(0.5);
-
-    // Ensure sync overlay size
-    setTimeout(syncOverlayCanvasDimensions, 50);
   }
 
   function clearImage() {
@@ -526,25 +533,16 @@
     const avgBefore = Math.round((totalLumBefore / sampleCount) / 255 * 100);
     const avgAfter = Math.round((totalLumAfter / sampleCount) / 255 * 100);
     metaLum.innerHTML = `${avgBefore}% &rarr; <strong>${avgAfter}%</strong>`;
-
-    syncOverlayCanvasDimensions();
-  }
-
-  // Synchronize overlay canvas with rendered base canvas
-  function syncOverlayCanvasDimensions() {
-    if (!loadedImage) return;
-    const rect = processedCanvas.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      originalCanvas.style.width = `${rect.width}px`;
-      originalCanvas.style.height = `${rect.height}px`;
-    }
   }
 
   // Split View Slider Controls
   function setSplitPosition(ratio) {
     currentSplitRatio = Math.max(0, Math.min(1, ratio));
     const percentage = currentSplitRatio * 100;
-    beforeOverlay.style.width = `${percentage}%`;
+    
+    // Hardware-accelerated clipPath pinned 1:1 on original canvas
+    originalCanvas.style.clipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
+    originalCanvas.style.webkitClipPath = `polygon(0 0, ${percentage}% 0, ${percentage}% 100%, 0 100%)`;
     sliderDivider.style.left = `${percentage}%`;
 
     // Update split button active states
@@ -552,12 +550,14 @@
     if (Math.abs(ratio - 0.25) < 0.02) splitBtn25.classList.add("active");
     else if (Math.abs(ratio - 0.50) < 0.02) splitBtn50.classList.add("active");
     else if (Math.abs(ratio - 0.75) < 0.02) splitBtn75.classList.add("active");
-
-    syncOverlayCanvasDimensions();
   }
 
   function onPointerDown(e) {
+    if (e.button !== undefined && e.button !== 0) return;
     isDraggingSlider = true;
+    try {
+      e.target.setPointerCapture(e.pointerId);
+    } catch (_) {}
     updateSplitFromPointer(e);
   }
 
@@ -566,16 +566,24 @@
     updateSplitFromPointer(e);
   }
 
-  function onPointerUp() {
-    isDraggingSlider = false;
+  function onPointerUp(e) {
+    if (isDraggingSlider) {
+      isDraggingSlider = false;
+      try {
+        if (e && e.target && e.target.releasePointerCapture) {
+          e.target.releasePointerCapture(e.pointerId);
+        }
+      } catch (_) {}
+    }
   }
 
   function updateSplitFromPointer(e) {
-    const rect = comparisonContainer.getBoundingClientRect();
+    const targetElement = imageStage || comparisonContainer;
+    const rect = targetElement.getBoundingClientRect();
     if (rect.width === 0) return;
-    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
     const offset = clientX - rect.left;
-    const ratio = offset / rect.width;
+    const ratio = Math.max(0, Math.min(1, offset / rect.width));
     setSplitPosition(ratio);
   }
 

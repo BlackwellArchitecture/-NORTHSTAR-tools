@@ -120,24 +120,25 @@
           </div>
 
           <div id="comparison-container" class="comparison-container">
-            <!-- Base Canvas: Processed Output -->
-            <canvas id="processed-canvas" class="canvas-base"></canvas>
+            <!-- Image Stage wraps canvases and divider to lock alignment 1:1 -->
+            <div id="image-stage" class="image-stage">
+              <!-- Base Canvas: Processed Output -->
+              <canvas id="processed-canvas" class="canvas-base"></canvas>
 
-            <!-- Overlay Clip: Original Input -->
-            <div id="before-overlay" class="before-overlay" style="width: 50%;">
+              <!-- Overlay Canvas: Original Input (clipped to split position) -->
               <canvas id="original-canvas" class="canvas-overlay"></canvas>
-            </div>
 
-            <!-- Draggable Divider Line & Handle -->
-            <div id="slider-divider" class="slider-divider" style="left: 50%;">
-              <div class="slider-handle" aria-label="Drag to compare original and adjusted versions" tabindex="0">
-                <span class="handle-icon">&harr;</span>
+              <!-- Draggable Divider Line & Handle -->
+              <div id="slider-divider" class="slider-divider" style="left: 50%;">
+                <div class="slider-handle" id="slider-handle" aria-label="Drag to compare original and adjusted versions" tabindex="0">
+                  <span class="handle-icon">&harr;</span>
+                </div>
               </div>
-            </div>
 
-            <!-- Corner Labels -->
-            <span class="view-tag tag-left">Original</span>
-            <span class="view-tag tag-right">Adjusted</span>
+              <!-- Corner Labels -->
+              <span class="view-tag tag-left">Original</span>
+              <span class="view-tag tag-right">Adjusted</span>
+            </div>
           </div>
 
           <div class="viewport-footer">
