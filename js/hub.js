@@ -27,6 +27,14 @@ const TOOLS = [
     path: "tools/slide-puzzle-solver/",
     tag: "Roblox Puzzle",
     date: "2024"
+  },
+  {
+    id: "quick-gamma",
+    title: "Quick Gamma",
+    description: "Quickly adjust super bright screenshots to make them crystal clear for screenshots",
+    path: "tools/quick-gamma/",
+    tag: "Image Utility",
+    date: "2024"
   }
 ];
 

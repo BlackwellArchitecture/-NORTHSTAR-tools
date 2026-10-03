@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Gamma - NORTHSTAR's tools</title>
+  <meta name="description" content="Quickly adjust super bright screenshots to make them crystal clear for screenshots">
+  <meta name="theme-color" content="#002B36">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../images/icon.png">
+  <link rel="apple-touch-icon" href="../../images/icon.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="tool.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container tool-wide-container">
+      <div class="header-content">
+        <img src="../../images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <span class="site-title"><a href="../../">NORTHSTAR's tools</a></span>
+          <span class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Tool Navigation Bar -->
+  <nav class="tool-nav-bar">
+    <div class="container tool-wide-container nav-container">
+      <a href="../../" class="back-link">&larr; Back to NORTHSTAR's tools</a>
+      <button class="share-tool-btn" id="share-page-btn" type="button" title="Copy link to this tool">Copy Tool Link</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container tool-wide-container">
+
+      <!-- Tool Header Block -->
+      <header class="tool-header-block">
+        <div class="tool-badge-row">
+          <span class="tool-badge">Image Utility</span>
+          <span class="tool-badge">Gamma &amp; Exposure</span>
+          <span class="tool-badge">Client-Side</span>
+        </div>
+        <h1 class="tool-main-title">Quick Gamma</h1>
+        <p class="tool-lead-desc">
+          Quickly adjust super bright screenshots to make them crystal clear for screenshots
+        </p>
+      </header>
+
+      <!-- Dropzone / Initial Empty State -->
+      <section id="dropzone-panel" class="dropzone-panel" aria-label="Screenshot Upload and Drop Zone">
+        <div class="dropzone-content">
+          <div class="dropzone-badge-indicator">READY FOR INPUT</div>
+          <h2 class="dropzone-title">Drop screenshot here, paste from clipboard, or browse</h2>
+          <p class="dropzone-desc">
+            Instantly balance overexposed glare, adjust gamma curves, lift shadows, and enhance screenshot readability. 100% client-side.
+          </p>
+
+          <div class="dropzone-actions">
+            <button type="button" id="btn-browse" class="btn btn-primary">
+              Select Screenshot
+            </button>
+            <input type="file" id="file-input" accept="image/*" class="visually-hidden">
+
+            <button type="button" id="btn-sample" class="btn btn-secondary">
+              Load Sample Overexposed Image
+            </button>
+          </div>
+
+          <div class="dropzone-hint">
+            Tip: Press <kbd>Ctrl + V</kbd> (or <kbd>Cmd + V</kbd>) from anywhere to paste directly.
+          </div>
+        </div>
+      </section>
+
+      <!-- Workbench (Hidden until image loaded) -->
+      <section id="workbench" class="workbench hidden" aria-label="Gamma Adjustment Workspace">
+
+        <!-- Workbench Top Control Header -->
+        <div class="workbench-bar">
+          <div class="workbench-bar-left">
+            <button type="button" id="btn-new-image" class="btn btn-secondary btn-sm" title="Clear current image and load another">
+              &larr; New Image
+            </button>
+
+            <span class="workbench-divider"></span>
+
+            <div class="preset-group" role="group" aria-label="Presets">
+              <span class="preset-label">Preset:</span>
+              <button type="button" class="preset-btn active" data-preset="deglare" title="Reduce blinding glare and recover washed-out highlights">
+                Quick De-Glare
+              </button>
+              <button type="button" class="preset-btn" data-preset="linear" title="100% linear unedited baseline">
+                Default
+              </button>
+              <button type="button" class="preset-btn" data-preset="highcontrast" title="Deepen blacks and sharpen text contrast">
+                High Contrast
+              </button>
+              <button type="button" class="preset-btn" data-preset="shadowreveal" title="Lift dark shadows while preserving highlights">
+                Shadow Reveal
+              </button>
+              <button type="button" class="preset-btn" data-preset="brighten" title="Heavy exposure amplification for pitch black captures">
+                Brighten Max
+              </button>
+            </div>
+          </div>
+
+          <div class="workbench-bar-right">
+            <span class="meta-item">Dimensions: <strong id="meta-dims">0 &times; 0 px</strong></span>
+            <span class="meta-item">Avg Luminance: <strong id="meta-lum">-- &rarr; --</strong></span>
+          </div>
+        </div>
+
+        <!-- Split View Comparison Viewport -->
+        <div class="viewport-card">
+          <div class="viewport-toolbar">
+            <span class="viewport-title">Interactive Comparison</span>
+            <div class="viewport-split-controls">
+              <button type="button" class="split-btn" id="split-btn-25" title="Move split to 25%">25%</button>
+              <button type="button" class="split-btn active" id="split-btn-50" title="Move split to 50%">50%</button>
+              <button type="button" class="split-btn" id="split-btn-75" title="Move split to 75%">75%</button>
+              <button type="button" class="split-btn" id="split-btn-toggle" title="Toggle full adjusted / original view">Hold: Compare</button>
+            </div>
+          </div>
+
+          <div id="comparison-container" class="comparison-container">
+            <!-- Base Canvas: Processed Output -->
+            <canvas id="processed-canvas" class="canvas-base"></canvas>
+
+            <!-- Overlay Clip: Original Input -->
+            <div id="before-overlay" class="before-overlay" style="width: 50%;">
+              <canvas id="original-canvas" class="canvas-overlay"></canvas>
+            </div>
+
+            <!-- Draggable Divider Line & Handle -->
+            <div id="slider-divider" class="slider-divider" style="left: 50%;">
+              <div class="slider-handle" aria-label="Drag to compare original and adjusted versions" tabindex="0">
+                <span class="handle-icon">&harr;</span>
+              </div>
+            </div>
+
+            <!-- Corner Labels -->
+            <span class="view-tag tag-left">Original</span>
+            <span class="view-tag tag-right">Adjusted</span>
+          </div>
+
+          <div class="viewport-footer">
+            <span>Drag the divider or click anywhere on the image to compare before and after.</span>
+          </div>
+        </div>
+
+        <!-- Adjustment Controls Panel -->
+        <div class="controls-panel">
+          <div class="controls-header">
+            <h2 class="controls-title">Fine-Tuning Adjustments</h2>
+            <button type="button" id="btn-reset-sliders" class="btn btn-secondary btn-sm" title="Reset all adjustment sliders to baseline">
+              Reset Values
+            </button>
+          </div>
+
+          <div class="sliders-grid">
+
+            <!-- Gamma Curve -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-gamma" class="control-label">Gamma Correction</label>
+                <span id="val-gamma" class="control-value">1.40</span>
+              </div>
+              <input type="range" id="slider-gamma" min="0.20" max="2.50" step="0.05" value="1.40" class="control-range">
+              <span class="control-desc">Midtone power curve. Values &gt; 1.0 tone down blinding glare; &lt; 1.0 lift dark midtones.</span>
+            </div>
+
+            <!-- Exposure Boost / Dim -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-exposure" class="control-label">Exposure (Multiplier)</label>
+                <span id="val-exposure" class="control-value">85%</span>
+              </div>
+              <input type="range" id="slider-exposure" min="20" max="300" step="1" value="85" class="control-range">
+              <span class="control-desc">Linear brightness scale. Lower to tame washed out screenshots; raise for dim captures.</span>
+            </div>
+
+            <!-- Shadow Lifter -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-shadow" class="control-label">Shadow Recovery</label>
+                <span id="val-shadow" class="control-value">0%</span>
+              </div>
+              <input type="range" id="slider-shadow" min="0" max="100" step="1" value="0" class="control-range">
+              <span class="control-desc">Non-linear lift specifically targeting dark pixels without blowing out highlights.</span>
+            </div>
+
+            <!-- Contrast -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-contrast" class="control-label">Contrast</label>
+                <span id="val-contrast" class="control-value">115%</span>
+              </div>
+              <input type="range" id="slider-contrast" min="50" max="200" step="1" value="115" class="control-range">
+              <span class="control-desc">Sharpens separation between dark and light tones, making washed text readable.</span>
+            </div>
+
+            <!-- Vibrance / Saturation -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-saturation" class="control-label">Vibrance / Saturation</label>
+                <span id="val-saturation" class="control-value">105%</span>
+              </div>
+              <input type="range" id="slider-saturation" min="0" max="200" step="1" value="105" class="control-range">
+              <span class="control-desc">Controls color richness and prevents screenshots from looking faded or washed out.</span>
+            </div>
+
+            <!-- Dynamic Histogram Stretch -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-hist" class="control-label">Histogram Stretch</label>
+                <span id="val-hist" class="control-value">20%</span>
+              </div>
+              <input type="range" id="slider-hist" min="0" max="100" step="1" value="20" class="control-range">
+              <span class="control-desc">Auto-expands pixel values to span the full dynamic spectrum between deepest and lightest pixels.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Export Toolbar -->
+        <div class="export-panel">
+          <div class="export-actions">
+            <button type="button" id="btn-download-png" class="btn btn-primary">
+              Download PNG
+            </button>
+            <button type="button" id="btn-download-jpg" class="btn btn-secondary">
+              Download JPEG
+            </button>
+            <button type="button" id="btn-copy-img" class="btn btn-secondary">
+              Copy Image to Clipboard
+            </button>
+          </div>
+          <span class="export-note">High-fidelity export rendered at original resolution.</span>
+        </div>
+
+      </section>
+
+      <!-- Utilitarian Protip / Guide -->
+      <section class="protip-box">
+        <strong>Usage Guide:</strong>
+        Screenshots taken with HDR monitors, high bloom, or overexposed games often appear washed out, blinding, or low-contrast.
+        Use <em>Quick De-Glare</em> or raise the <em>Gamma Correction</em> slider above <code>1.0</code> to pull down blinding white areas, then increase <em>Contrast</em> to make in-game text, UI elements, and HUDs clear and legible.
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container tool-wide-container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools &bull; Quick Gamma</span>
+        <span>Client-side HTML5 Canvas Engine</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="tool.js"></script>
+</body>
+</html>
