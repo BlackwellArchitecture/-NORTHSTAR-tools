@@ -72,45 +72,13 @@
 
   // Preset Definitions
   const PRESETS = {
-    deglare: {
-      exposure: 85,
-      gamma: 1.40,
-      shadow: 0,
-      contrast: 115,
-      saturation: 105,
-      hist: 15
-    },
-    linear: {
+    recommended: {
       exposure: 100,
-      gamma: 1.00,
+      gamma: 0.20,
       shadow: 0,
-      contrast: 100,
+      contrast: 175,
       saturation: 100,
       hist: 0
-    },
-    highcontrast: {
-      exposure: 95,
-      gamma: 1.20,
-      shadow: 0,
-      contrast: 135,
-      saturation: 110,
-      hist: 25
-    },
-    shadowreveal: {
-      exposure: 110,
-      gamma: 0.65,
-      shadow: 40,
-      contrast: 110,
-      saturation: 105,
-      hist: 20
-    },
-    brighten: {
-      exposure: 160,
-      gamma: 0.40,
-      shadow: 60,
-      contrast: 125,
-      saturation: 120,
-      hist: 40
     }
   };
 
@@ -125,7 +93,7 @@
     fileInput.addEventListener("change", handleFileSelect);
     btnSample.addEventListener("click", loadSampleImage);
     btnNewImage.addEventListener("click", clearImage);
-    btnResetSliders.addEventListener("click", () => applyPresetValues("linear"));
+    btnResetSliders.addEventListener("click", () => applyPresetValues("recommended"));
 
     // Global Paste
     window.addEventListener("paste", handleGlobalPaste);
@@ -259,91 +227,89 @@
     reader.readAsDataURL(file);
   }
 
-  // Load Overexposed Sample Image
+  // Load Dark Sample Screenshot
   function loadSampleImage() {
     const tempCanvas = document.createElement("canvas");
     tempCanvas.width = 1280;
     tempCanvas.height = 720;
     const ctx = tempCanvas.getContext("2d");
 
-    // Overexposed / Blown out sky gradient
+    // Pitch-dark night sky
     const skyGrad = ctx.createLinearGradient(0, 0, 0, 480);
-    skyGrad.addColorStop(0, "#ffffff");
-    skyGrad.addColorStop(0.3, "#f4f9fd");
-    skyGrad.addColorStop(0.7, "#d2e4f2");
-    skyGrad.addColorStop(1, "#b5d4eb");
+    skyGrad.addColorStop(0, "#020407");
+    skyGrad.addColorStop(0.5, "#04070e");
+    skyGrad.addColorStop(1, "#070c18");
     ctx.fillStyle = skyGrad;
     ctx.fillRect(0, 0, 1280, 720);
 
-    // Blinding sun / bloom glare
-    const sunGrad = ctx.createRadialGradient(920, 120, 10, 920, 120, 420);
-    sunGrad.addColorStop(0, "rgba(255, 255, 255, 1.0)");
-    sunGrad.addColorStop(0.4, "rgba(255, 255, 250, 0.85)");
-    sunGrad.addColorStop(0.8, "rgba(255, 245, 220, 0.45)");
-    sunGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-    ctx.fillStyle = sunGrad;
-    ctx.fillRect(0, 0, 1280, 720);
-
-    // Overexposed washed-out mountains
-    ctx.fillStyle = "#cfd8dc";
+    // Faint dark mountains hidden in night shadows
+    ctx.fillStyle = "#09101d";
     ctx.beginPath();
     ctx.moveTo(0, 480);
-    ctx.lineTo(260, 240);
-    ctx.lineTo(540, 420);
-    ctx.lineTo(840, 190);
-    ctx.lineTo(1100, 390);
-    ctx.lineTo(1280, 260);
+    ctx.lineTo(260, 280);
+    ctx.lineTo(540, 440);
+    ctx.lineTo(840, 240);
+    ctx.lineTo(1100, 410);
+    ctx.lineTo(1280, 290);
     ctx.lineTo(1280, 720);
     ctx.lineTo(0, 720);
     ctx.fill();
 
-    // Foreground terrain
-    ctx.fillStyle = "#b0bec5";
+    // Dark foreground terrain
+    ctx.fillStyle = "#050a12";
     ctx.beginPath();
-    ctx.moveTo(0, 560);
-    ctx.lineTo(340, 490);
-    ctx.lineTo(760, 580);
-    ctx.lineTo(1280, 510);
+    ctx.moveTo(0, 570);
+    ctx.lineTo(340, 510);
+    ctx.lineTo(760, 600);
+    ctx.lineTo(1280, 530);
     ctx.lineTo(1280, 720);
     ctx.lineTo(0, 720);
     ctx.fill();
 
-    // Washed out game UI elements and text (low contrast in glare)
-    ctx.fillStyle = "rgba(255, 255, 255, 0.55)";
-    ctx.fillRect(40, 40, 420, 140);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(40, 40, 420, 140);
+    // Faint stars
+    for (let i = 0; i < 45; i++) {
+      const sx = (i * 97) % 1280;
+      const sy = (i * 53) % 360;
+      const alpha = 0.08 + (i % 5) * 0.04;
+      ctx.fillStyle = `rgba(220, 235, 255, ${alpha})`;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
 
+    // Very dark hidden HUD container
+    ctx.fillStyle = "rgba(10, 18, 30, 0.75)";
+    ctx.fillRect(40, 40, 440, 140);
+    ctx.strokeStyle = "rgba(20, 35, 55, 0.9)";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(40, 40, 440, 140);
+
+    // Faint hidden diagnostic text in shadows
     ctx.font = "bold 15px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, monospace";
-    ctx.fillStyle = "#78909c";
-    ctx.fillText("SESSION DIAGNOSTICS [HDR CAPTURE: 800 NITS]", 60, 75);
+    ctx.fillStyle = "#16253b";
+    ctx.fillText("SESSION: NIGHT RECON OPS [SHADOW LEVEL: 96%]", 60, 75);
 
     ctx.font = "14px monospace";
-    ctx.fillStyle = "#90a4ae";
-    ctx.fillText("MISSION: INFILTRATE HIGH-EXPOSURE VALLEY", 60, 105);
-    ctx.fillText("STATUS: ACTIVE // ELEVATION: 4,120M", 60, 130);
-    ctx.fillText("NOTICE: GLARE LEVEL CRITICAL (GAMMA > 1.0 RECOMMENDED)", 60, 155);
+    ctx.fillStyle = "#122033";
+    ctx.fillText("TARGET: SEC-09 SUBTERRANEAN ENTRANCE", 60, 105);
+    ctx.fillText("COORDINATES: X: 489.2 // Y: 812.9 // Z: 102.4", 60, 130);
+    ctx.fillText("STATUS: GAMMA 0.20 RECOMMENDED TO CLARIFY", 60, 155);
 
-    // Floating reticle and waypoint
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+    // Dark reticle and marker
+    ctx.strokeStyle = "rgba(22, 38, 58, 0.9)";
     ctx.lineWidth = 2;
     ctx.strokeRect(620, 340, 40, 40);
     ctx.beginPath();
     ctx.arc(640, 360, 6, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+    ctx.fillStyle = "rgba(25, 42, 65, 0.95)";
     ctx.fill();
 
     ctx.font = "bold 13px monospace";
-    ctx.fillStyle = "#607d8b";
-    ctx.fillText("WAYPOINT ALPHA [450M]", 575, 410);
+    ctx.fillStyle = "#152438";
+    ctx.fillText("TARGET LOCK: ALPHA [450M]", 570, 410);
 
     const img = new Image();
     img.onload = () => {
       initImage(img);
-      applyPresetValues("deglare");
-      highlightPresetBtn("deglare");
-      showToast("Loaded sample overexposed screenshot with Quick De-Glare");
+      showToast("Loaded sample dark screenshot with Recommended settings");
     };
     img.src = tempCanvas.toDataURL("image/png");
   }
@@ -369,8 +335,8 @@
 
     metaDims.textContent = `${w} × ${h} px`;
 
-    // Apply default or current values
-    scheduleProcessing();
+    // Apply Recommended preset on load
+    applyPresetValues("recommended");
 
     // Default to 50% split
     setSplitPosition(0.5);

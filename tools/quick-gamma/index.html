@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quick Gamma - NORTHSTAR's tools</title>
-  <meta name="description" content="Quickly adjust super bright screenshots to make them crystal clear for screenshots">
+  <meta name="description" content="Quickly adjust super dark screenshots to make them crystal clear as the final output">
   <meta name="theme-color" content="#002B36">
 
   <!-- Favicon -->
@@ -51,7 +51,7 @@
         </div>
         <h1 class="tool-main-title">Quick Gamma</h1>
         <p class="tool-lead-desc">
-          Quickly adjust super bright screenshots to make them crystal clear for screenshots
+          Quickly adjust super dark screenshots to make them crystal clear as the final output
         </p>
       </header>
 
@@ -61,7 +61,7 @@
           <div class="dropzone-badge-indicator">READY FOR INPUT</div>
           <h2 class="dropzone-title">Drop screenshot here, paste from clipboard, or browse</h2>
           <p class="dropzone-desc">
-            Instantly balance overexposed glare, adjust gamma curves, lift shadows, and enhance screenshot readability. 100% client-side.
+            Instantly lift dark shadows, adjust gamma curves, and enhance screenshot readability. 100% client-side.
           </p>
 
           <div class="dropzone-actions">
@@ -71,7 +71,7 @@
             <input type="file" id="file-input" accept="image/*" class="visually-hidden">
 
             <button type="button" id="btn-sample" class="btn btn-secondary">
-              Load Sample Overexposed Image
+              Load Sample Dark Screenshot
             </button>
           </div>
 
@@ -95,20 +95,8 @@
 
             <div class="preset-group" role="group" aria-label="Presets">
               <span class="preset-label">Preset:</span>
-              <button type="button" class="preset-btn active" data-preset="deglare" title="Reduce blinding glare and recover washed-out highlights">
-                Quick De-Glare
-              </button>
-              <button type="button" class="preset-btn" data-preset="linear" title="100% linear unedited baseline">
-                Default
-              </button>
-              <button type="button" class="preset-btn" data-preset="highcontrast" title="Deepen blacks and sharpen text contrast">
-                High Contrast
-              </button>
-              <button type="button" class="preset-btn" data-preset="shadowreveal" title="Lift dark shadows while preserving highlights">
-                Shadow Reveal
-              </button>
-              <button type="button" class="preset-btn" data-preset="brighten" title="Heavy exposure amplification for pitch black captures">
-                Brighten Max
+              <button type="button" class="preset-btn active" data-preset="recommended" title="Gamma 0.20, Exposure 100%, Contrast 175%">
+                Recommended
               </button>
             </div>
           </div>
@@ -172,20 +160,20 @@
             <div class="control-box">
               <div class="control-label-row">
                 <label for="slider-gamma" class="control-label">Gamma Correction</label>
-                <span id="val-gamma" class="control-value">1.40</span>
+                <span id="val-gamma" class="control-value">0.20</span>
               </div>
-              <input type="range" id="slider-gamma" min="0.20" max="2.50" step="0.05" value="1.40" class="control-range">
-              <span class="control-desc">Midtone power curve. Values &gt; 1.0 tone down blinding glare; &lt; 1.0 lift dark midtones.</span>
+              <input type="range" id="slider-gamma" min="0.05" max="2.50" step="0.05" value="0.20" class="control-range">
+              <span class="control-desc">Midtone power curve. Values &lt; 1.0 lift dark midtones and reveal shadow details.</span>
             </div>
 
             <!-- Exposure Boost / Dim -->
             <div class="control-box">
               <div class="control-label-row">
                 <label for="slider-exposure" class="control-label">Exposure (Multiplier)</label>
-                <span id="val-exposure" class="control-value">85%</span>
+                <span id="val-exposure" class="control-value">100%</span>
               </div>
-              <input type="range" id="slider-exposure" min="20" max="300" step="1" value="85" class="control-range">
-              <span class="control-desc">Linear brightness scale. Lower to tame washed out screenshots; raise for dim captures.</span>
+              <input type="range" id="slider-exposure" min="20" max="300" step="1" value="100" class="control-range">
+              <span class="control-desc">Linear brightness scale. Multiplies overall pixel luminance.</span>
             </div>
 
             <!-- Shadow Lifter -->
@@ -202,9 +190,9 @@
             <div class="control-box">
               <div class="control-label-row">
                 <label for="slider-contrast" class="control-label">Contrast</label>
-                <span id="val-contrast" class="control-value">115%</span>
+                <span id="val-contrast" class="control-value">175%</span>
               </div>
-              <input type="range" id="slider-contrast" min="50" max="200" step="1" value="115" class="control-range">
+              <input type="range" id="slider-contrast" min="50" max="250" step="1" value="175" class="control-range">
               <span class="control-desc">Sharpens separation between dark and light tones, making washed text readable.</span>
             </div>
 
@@ -212,9 +200,9 @@
             <div class="control-box">
               <div class="control-label-row">
                 <label for="slider-saturation" class="control-label">Vibrance / Saturation</label>
-                <span id="val-saturation" class="control-value">105%</span>
+                <span id="val-saturation" class="control-value">100%</span>
               </div>
-              <input type="range" id="slider-saturation" min="0" max="200" step="1" value="105" class="control-range">
+              <input type="range" id="slider-saturation" min="0" max="200" step="1" value="100" class="control-range">
               <span class="control-desc">Controls color richness and prevents screenshots from looking faded or washed out.</span>
             </div>
 
@@ -222,9 +210,9 @@
             <div class="control-box">
               <div class="control-label-row">
                 <label for="slider-hist" class="control-label">Histogram Stretch</label>
-                <span id="val-hist" class="control-value">20%</span>
+                <span id="val-hist" class="control-value">0%</span>
               </div>
-              <input type="range" id="slider-hist" min="0" max="100" step="1" value="20" class="control-range">
+              <input type="range" id="slider-hist" min="0" max="100" step="1" value="0" class="control-range">
               <span class="control-desc">Auto-expands pixel values to span the full dynamic spectrum between deepest and lightest pixels.</span>
             </div>
 
@@ -252,8 +240,8 @@
       <!-- Utilitarian Protip / Guide -->
       <section class="protip-box">
         <strong>Usage Guide:</strong>
-        Screenshots taken with HDR monitors, high bloom, or overexposed games often appear washed out, blinding, or low-contrast.
-        Use <em>Quick De-Glare</em> or raise the <em>Gamma Correction</em> slider above <code>1.0</code> to pull down blinding white areas, then increase <em>Contrast</em> to make in-game text, UI elements, and HUDs clear and legible.
+        Screenshots taken in dark environments, night scenes, or underexposed games often appear pitch-black or muddy.
+        Use <em>Recommended</em> (Gamma 0.20, Contrast 175%, Exposure 100%) to immediately lift hidden details out of deep shadows while keeping text and edges crystal clear as the final output.
       </section>
 
     </div>

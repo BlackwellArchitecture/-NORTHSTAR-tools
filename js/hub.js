@@ -31,7 +31,7 @@ const TOOLS = [
   {
     id: "quick-gamma",
     title: "Quick Gamma",
-    description: "Quickly adjust super bright screenshots to make them crystal clear for screenshots",
+    description: "Quickly adjust super dark screenshots to make them crystal clear as the final output",
     path: "tools/quick-gamma/",
     tag: "Image Utility",
     date: "2024"
