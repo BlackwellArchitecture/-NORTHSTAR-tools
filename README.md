@@ -24,6 +24,7 @@ A fast, lightweight, zero-bloat tools hub built with a 2018 indie developer aest
 | **Hunt: 20 Pizza Place Trophy Brute Forcer** | `/tools/hunt-20-pizza-place-trophy/` | Calculates all 24 emoji permutations for the 20-trophy puzzle in Work at a Pizza Place and tests random untried combinations until solved. |
 | **Roblox Slide Puzzle Solver (NxN)** | `/tools/slide-puzzle-solver/` | Step-by-step solver and visual guide for arbitrary NxN sliding puzzles and Roblox floor slide puzzles with image slicing, move guidance, and parity checking. |
 | **Quick Gamma** | `/tools/quick-gamma/` | Quickly adjust super dark screenshots to make them crystal clear as the final output. |
+| **Cinematic Screenshot** | `/tools/cinematic-screenshot/` | Transform pictures and screenshots into cinematic widescreen stills with movie letterbox bars, Instagram-inspired filters, vignette, and 35mm grain. |
 
 ---
 

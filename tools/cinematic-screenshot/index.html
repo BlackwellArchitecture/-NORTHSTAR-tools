@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinematic Screenshot - NORTHSTAR's tools</title>
+  <meta name="description" content="Transform screenshots into cinematic widescreen stills with movie letterbox bars, Instagram-inspired filters, vignette, and film grain.">
+  <meta name="theme-color" content="#002B36">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../../images/icon.png">
+  <link rel="apple-touch-icon" href="../../images/icon.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="tool.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="container tool-wide-container">
+      <div class="header-content">
+        <img src="../../images/icon.png" alt="NORTHSTAR icon" class="site-icon">
+        <div class="site-title-group">
+          <span class="site-title"><a href="../../">NORTHSTAR's tools</a></span>
+          <span class="site-subtitle">Tools made for NORTHSTAR, and maybe for some people</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Top Tool Navigation Bar -->
+  <nav class="tool-nav-bar">
+    <div class="container tool-wide-container nav-container">
+      <a href="../../" class="back-link">&larr; Back to NORTHSTAR's tools</a>
+      <button class="share-tool-btn" id="share-page-btn" type="button" title="Copy link to this tool">Copy Tool Link</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="site-main">
+    <div class="container tool-wide-container">
+
+      <!-- Tool Header Block -->
+      <header class="tool-header-block">
+        <div class="tool-badge-row">
+          <span class="tool-badge">Image Utility</span>
+          <span class="tool-badge">Cinematic Grading</span>
+          <span class="tool-badge">Client-Side</span>
+        </div>
+        <h1 class="tool-main-title">Cinematic Screenshot</h1>
+        <p class="tool-lead-desc">
+          Paste or upload any image to give it an authentic widescreen cinema look with customizable movie bars, vignette, subtle film grain, and aesthetic color grading.
+        </p>
+      </header>
+
+      <!-- Dropzone / Initial Empty State -->
+      <section id="dropzone-panel" class="dropzone-panel" aria-label="Screenshot Upload and Drop Zone">
+        <div class="dropzone-content">
+          <div class="dropzone-badge-indicator">READY FOR INPUT</div>
+          <h2 class="dropzone-title">Drop picture here, paste from clipboard, or browse</h2>
+          <p class="dropzone-desc">
+            Outputs high-fidelity cinematic stills with movie letterbox bars, lens vignette, and color grading. 100% private and client-side.
+          </p>
+
+          <div class="dropzone-actions">
+            <button type="button" id="btn-browse" class="btn btn-primary">
+              Select Picture
+            </button>
+            <input type="file" id="file-input" accept="image/*" class="visually-hidden">
+
+            <button type="button" id="btn-sample" class="btn btn-secondary">
+              Load Sample Picture
+            </button>
+          </div>
+
+          <div class="dropzone-hint">
+            Tip: Press <kbd>Ctrl + V</kbd> (or <kbd>Cmd + V</kbd>) anywhere to paste directly from your clipboard.
+          </div>
+        </div>
+      </section>
+
+      <!-- Workbench (Hidden until image loaded) -->
+      <section id="workbench" class="workbench hidden" aria-label="Cinematic Screenshot Workspace">
+
+        <!-- Workbench Top Control Header -->
+        <div class="workbench-bar">
+          <div class="workbench-bar-left">
+            <button type="button" id="btn-new-image" class="btn btn-secondary btn-sm" title="Clear current image and load another">
+              &larr; New Picture
+            </button>
+            <span class="workbench-divider"></span>
+            <button type="button" id="btn-compare" class="btn btn-secondary btn-sm" title="Click and hold to compare with original image">
+              Hold: Compare
+            </button>
+          </div>
+
+          <div class="workbench-bar-right">
+            <span class="meta-item">Dimensions: <strong id="meta-dims">0 &times; 0 px</strong></span>
+            <span class="meta-item">Aspect: <strong id="meta-aspect">--</strong></span>
+          </div>
+        </div>
+
+        <!-- Viewport Canvas Card -->
+        <div class="viewport-card">
+          <div class="viewport-stage" id="viewport-stage">
+            <canvas id="main-canvas" class="main-canvas"></canvas>
+            <canvas id="compare-canvas" class="compare-canvas hidden"></canvas>
+            <div id="compare-badge" class="compare-badge hidden">ORIGINAL</div>
+          </div>
+        </div>
+
+        <!-- Filter Presets Strip (Display as is, without text labels or names) -->
+        <div class="filter-strip-section">
+          <div class="filter-strip-header">
+            <span class="filter-strip-title">Filter Presets</span>
+            <span class="filter-strip-hint">Select a preset to apply instant cinematic grading</span>
+          </div>
+          <div class="filter-strip-scroll" id="filter-strip-container" role="radiogroup" aria-label="Filter presets">
+            <!-- Filter preset tiles dynamically rendered without labels as pure visual swatches -->
+          </div>
+        </div>
+
+        <!-- Fine-Tuning Adjustments Panel -->
+        <div class="controls-panel">
+          <div class="controls-header">
+            <h2 class="controls-title">Cinematic Adjustments</h2>
+            <button type="button" id="btn-reset-sliders" class="btn btn-secondary btn-sm" title="Reset all adjustments to default">
+              Reset Adjustments
+            </button>
+          </div>
+
+          <!-- Movie Bars Settings -->
+          <div class="movie-bars-box">
+            <div class="movie-bars-top">
+              <div class="movie-bars-toggle-group">
+                <label class="switch-label" for="toggle-bars">
+                  <input type="checkbox" id="toggle-bars" class="switch-checkbox" checked>
+                  <span class="switch-custom"></span>
+                  <span class="switch-text">Movie Letterbox Bars</span>
+                </label>
+              </div>
+
+              <div class="aspect-presets" role="group" aria-label="Aspect Ratio Presets">
+                <span class="aspect-presets-label">Cinema Ratio:</span>
+                <button type="button" class="aspect-btn active" data-ratio="2.39" title="2.39:1 Anamorphic Widescreen">2.39:1</button>
+                <button type="button" class="aspect-btn" data-ratio="2.35" title="2.35:1 CinemaScope">2.35:1</button>
+                <button type="button" class="aspect-btn" data-ratio="1.85" title="1.85:1 Academy Flat">1.85:1</button>
+                <button type="button" class="aspect-btn" data-ratio="custom" title="Custom Bar Thickness">Custom</button>
+              </div>
+            </div>
+
+            <div class="control-box bar-slider-box" id="bar-thickness-container">
+              <div class="control-label-row">
+                <label for="slider-bars" class="control-label">Bar Thickness</label>
+                <span id="val-bars" class="control-value">12.5%</span>
+              </div>
+              <input type="range" id="slider-bars" min="0" max="25" step="0.5" value="12.5" class="control-range">
+              <span class="control-desc">Thickness of top and bottom matte bars for dramatic theatrical presentation.</span>
+            </div>
+          </div>
+
+          <!-- Slider Controls Grid -->
+          <div class="sliders-grid">
+
+            <!-- Vignette -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-vignette" class="control-label">Vignette</label>
+                <span id="val-vignette" class="control-value">40%</span>
+              </div>
+              <input type="range" id="slider-vignette" min="0" max="100" step="1" value="40" class="control-range">
+              <span class="control-desc">Smooth optical edge falloff that draws eye focus to the center subject.</span>
+            </div>
+
+            <!-- Film Grain -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-grain" class="control-label">Film Grain</label>
+                <span id="val-grain" class="control-value">20%</span>
+              </div>
+              <input type="range" id="slider-grain" min="0" max="100" step="1" value="20" class="control-range">
+              <span class="control-desc">Authentic 35mm motion-picture film texture and organic noise.</span>
+            </div>
+
+            <!-- Color Warmth / Temperature -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-warmth" class="control-label">Warmth / Temperature</label>
+                <span id="val-warmth" class="control-value">0</span>
+              </div>
+              <input type="range" id="slider-warmth" min="-100" max="100" step="1" value="0" class="control-range">
+              <span class="control-desc">Cool cinematic blues on negative, warm golden hour tones on positive.</span>
+            </div>
+
+            <!-- Contrast -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-contrast" class="control-label">Contrast</label>
+                <span id="val-contrast" class="control-value">115%</span>
+              </div>
+              <input type="range" id="slider-contrast" min="50" max="200" step="1" value="115" class="control-range">
+              <span class="control-desc">Separation between deep shadows and bright cinematic highlights.</span>
+            </div>
+
+            <!-- Exposure / Brightness -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-exposure" class="control-label">Exposure</label>
+                <span id="val-exposure" class="control-value">0%</span>
+              </div>
+              <input type="range" id="slider-exposure" min="-50" max="50" step="1" value="0" class="control-range">
+              <span class="control-desc">Overall image luminance and exposure compensation.</span>
+            </div>
+
+            <!-- Saturation -->
+            <div class="control-box">
+              <div class="control-label-row">
+                <label for="slider-saturation" class="control-label">Saturation</label>
+                <span id="val-saturation" class="control-value">110%</span>
+              </div>
+              <input type="range" id="slider-saturation" min="0" max="200" step="1" value="110" class="control-range">
+              <span class="control-desc">Intensity of image color gamut and tonal richness.</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Export Toolbar -->
+        <div class="export-panel">
+          <div class="export-actions">
+            <button type="button" id="btn-download-png" class="btn btn-primary">
+              Download PNG
+            </button>
+            <button type="button" id="btn-download-jpg" class="btn btn-secondary">
+              Download JPEG
+            </button>
+            <button type="button" id="btn-copy-img" class="btn btn-secondary">
+              Copy Image to Clipboard
+            </button>
+          </div>
+          <span class="export-note">Rendered at original full screenshot resolution with letterbox bars.</span>
+        </div>
+
+      </section>
+
+      <!-- Utilitarian Protip / Guide -->
+      <section class="protip-box">
+        <strong>Cinematic Protip:</strong>
+        Real anamorphic cinema utilizes a 2.39:1 aspect ratio. Toggle movie bars and adjust the vignette to 35-45% with subtle film grain (15-25%) to immediately transform ordinary game captures, wallpaper screenshots, or desktop moments into theatrical stills. You can copy directly to your clipboard or download high-res files.
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container tool-wide-container">
+      <div class="footer-content">
+        <span>NORTHSTAR's tools &bull; Cinematic Screenshot</span>
+        <span>Client-side HTML5 Canvas Engine</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast" role="alert" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="tool.js"></script>
+</body>
+</html>

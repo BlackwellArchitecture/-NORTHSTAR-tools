@@ -35,6 +35,14 @@ const TOOLS = [
     path: "tools/quick-gamma/",
     tag: "Image Utility",
     date: "2024"
+  },
+  {
+    id: "cinematic-screenshot",
+    title: "Cinematic Screenshot",
+    description: "Transform pictures and screenshots into cinematic widescreen stills with movie letterbox bars, Instagram-inspired filters, vignette, and 35mm grain.",
+    path: "tools/cinematic-screenshot/",
+    tag: "Image Utility",
+    date: "2024"
   }
 ];
 
